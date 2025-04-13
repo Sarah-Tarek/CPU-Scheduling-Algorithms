@@ -78,5 +78,29 @@ struct CompareArrivalTimeAscending {
     }
 };
 
+struct CompareBurst {
+    bool operator()(const Process &a, const Process &b) {
+        if (a.burstTime != b.burstTime)
+            return a.burstTime > b.burstTime; // Smaller burst time first (min-heap)
+        else if (a.arrivalTime != b.arrivalTime)
+            return a.arrivalTime > b.arrivalTime;     // Earlier arrival first
+        else
+            return a.id > b.id;             // Smaller PID first
+    }
+};
+
+struct ComparePriority {
+    bool operator()(const Process &a, const Process &b) {
+        if (a.priority != b.priority)
+            return a.priority > b.priority;          // Lower priority first
+        else if (a.arrivalTime != b.arrivalTime)
+            return a.arrivalTime > b.arrivalTime;            // Earlier arrival first
+        else if (a.burstTime != b.burstTime)
+            return a.burstTime > b.burstTime;        // Shorter burst time first
+        else
+            return a.id > b.id;                    // Lower PID first
+    }
+};
+
 
 #endif

@@ -4,6 +4,10 @@
 #include <queue>
 #include "process.h" 
 #include <unordered_map>
+#include <iostream>
+#include <vector>
+
+using namespace std;
 
 
 // Queue to hold processes that are ready to be scheduled
