@@ -1,24 +1,11 @@
 #include "../header_files/global_variables.h"
 //#include "global_variables.h"
 #include <iostream>
-#include <queue>
 #include <vector>
-#include <unordered_map>
 #include <thread>
-#include <mutex>
 #include <chrono>
-#include <condition_variable>
 using namespace std;
 
-
-mutex mtx_readyQueue;
-mutex mtx_table;
-mutex mtx_jobQueue;
-mutex mtx_currentTime;
-
-condition_variable cv_readyQueue;
-
-queue<Process> jobQueue;
 
 
 void SJF_NonPreemptive() {
@@ -106,7 +93,7 @@ void SJF_NonPreemptive() {
     
 }
 
-// Function to continuously print the live table of process execution
+/*// Function to continuously print the live table of process execution
 void printTableLive() {
     // Infinite loop to keep the table updated in real-time
     while (true) {
@@ -129,7 +116,7 @@ void printTableLive() {
             table.clear();
         }
     }
-}
+}*/
 
 
 
@@ -169,7 +156,7 @@ void addToReadyQueue() {
     }
 }
 
-//test 
+/*//test 
 int main()
 {
     Process p1("p1", 0, 3);
@@ -192,7 +179,7 @@ int main()
     t3.join();
 }
 
-/*//test
+//test
 int main() {
     
     Process p1("p1",0,5); //id arrival burst 
