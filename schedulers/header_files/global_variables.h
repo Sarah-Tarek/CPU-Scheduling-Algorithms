@@ -26,4 +26,24 @@ extern int totalWaitingTime;
 // Accumulates the total turnaround time of all processes (used for average turnaround time calculation)
 extern int totalTurnaroundTime;
 
+// Queue holding incoming jobs before they're moved to the ready queue
+extern queue<Process> jobQueue;
+
+// Mutex to protect access to the ready queue (used when scheduling or adding processes)
+extern mutex mtx_readyQueue;
+
+// Mutex to protect access to the process table (likely used for burst time updates, etc.)
+extern mutex mtx_table;
+
+// Mutex to protect access to the job queue (synchronizing incoming processes)
+extern mutex mtx_jobQueue;
+
+// Mutex to protect access to the shared current time variable used by the scheduler
+extern mutex mtx_currentTime;
+
+// Condition variable to notify scheduler or threads when the ready queue has been updated
+extern condition_variable cv_readyQueue;
+
 #endif
+
+
