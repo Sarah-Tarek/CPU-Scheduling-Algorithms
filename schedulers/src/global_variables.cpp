@@ -1,4 +1,5 @@
-#include "global_variables.h"
+//#include "global_variables.h"
+#include "../header_files/global_variables.h"
 
 // Queue to hold processes that are ready to be scheduled
 queue<Process> readyQueue;
