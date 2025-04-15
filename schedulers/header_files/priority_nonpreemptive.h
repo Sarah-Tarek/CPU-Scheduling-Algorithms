@@ -3,6 +3,6 @@
 
 
 // Function implementing the Priority Nonpreemptive Scheduling Algorithm
-void Priority_NonPreemptive()();
+void Priority_NonPreemptive();
 
 #endif
