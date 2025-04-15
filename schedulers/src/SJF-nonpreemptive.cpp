@@ -4,6 +4,7 @@
 #include <vector>
 #include <thread>
 #include <chrono>
+#include "SJF_nonpreemptive.h"
 using namespace std;
 
 
