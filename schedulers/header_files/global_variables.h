@@ -4,12 +4,8 @@
 #include <queue>
 #include "process.h" 
 #include <unordered_map>
-#include <iostream>
-#include <vector>
-
-using namespace std;
-
-
+#include<mutex>
+#include <condition_variable>
 // Queue to hold processes that are ready to be scheduled
 extern queue<Process> readyQueue;
 
