@@ -18,7 +18,7 @@
 #include<iostream>
 #include <climits>
 #include<algorithm>
-
+#include<thread>
 using namespace std;
 
 void Sjf_Preemptive_Schedular() {
@@ -30,17 +30,26 @@ void Sjf_Preemptive_Schedular() {
 	Process *current_process;
 
 	// Main simulation loop (runs indefinitely in this case)
+
 	while (true) {
 		// Dynamically allocate a new Process object and assign it to current_process
 		current_process = new Process();
 
 		// Move processes from the readyQueue to the processes vector
 		// readyQueue is assumed to be a global queue of processes
-		while (!readyQueue.empty()) {
-			processes.push_back(readyQueue.front()); // Add the process to the vector
-			readyQueue.pop(); // Remove it from the queue
-		}
 
+		{
+			// Lock the readyQueue mutex to safely access the readyQueue
+			unique_lock<mutex> lock(mtx_readyQueue);
+
+			// Wait for a signal from the condition variable (cv_readyQueue) before continuing
+			// to ensure that the ready queue has processes available
+			cv_readyQueue.wait_for(lock, std::chrono::seconds(1));
+			while (!readyQueue.empty()) {
+				processes.push_back(readyQueue.front()); // Add the process to the vector
+				readyQueue.pop(); // Remove it from the queue
+			}
+		}
 		// Initialize the minimum remaining time to the maximum possible value
 		int min = INT_MAX;
 
@@ -55,14 +64,14 @@ void Sjf_Preemptive_Schedular() {
 		// If the current process is idle
 		if (current_process->id == "idle") {
 			/*cout << "Time " << currentTime << ": Process "
-					<< current_process->id << " \n";*/
+			 << current_process->id << " \n";*/
 		} else {
 			// If the current process is not idle, decrement its remaining time
 			current_process->remainingTime--;
 
 			// Log the process that is running at this time
 			/*cout << "Time " << currentTime << ": Process "
-					<< current_process->id << " is running\n";*/
+			 << current_process->id << " is running\n";*/
 
 			// If the current process has finished (remainingTime is now 0)
 			if (current_process->remainingTime == 0) {
@@ -78,11 +87,13 @@ void Sjf_Preemptive_Schedular() {
 				totalTurnaroundTime += current_process->turnaroundTime;
 			}
 		}
-
+		// Locking table to safely update process state
 		// Record the state of the current process in the table (a map)
 		// The key is the currentTime, and the value is a copy of current_process
-		table[currentTime] = *current_process;
-
+		{
+			lock_guard<mutex> lock(mtx_table);
+			table[currentTime] = *current_process;
+		}
 		// If the current process has finished (remainingTime == 0), remove it from the vector
 		if (current_process->remainingTime == 0) {
 			// Find the process in the vector
@@ -98,8 +109,14 @@ void Sjf_Preemptive_Schedular() {
 			}
 		}
 
-		// Increment the global time counter
-		currentTime++;
+		// Locking currentTime before incrementing
+
+		{
+			lock_guard<mutex> lock2(mtx_currentTime);
+			// Increment the global time counter
+			currentTime++;
+		}
+
 	}
 }
 
