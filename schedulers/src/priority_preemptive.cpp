@@ -7,6 +7,7 @@
 #include <thread>
 #include <mutex>
 #include <chrono>
+#include <condition_variable>
 using namespace std;
 
 
@@ -16,6 +17,8 @@ mutex mtx_jobQueue;
 mutex mtx_currentTime;
 
 condition_variable cv_readyQueue;
+
+
 
 queue<Process> jobQueue;
 
