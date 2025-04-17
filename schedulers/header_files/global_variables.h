@@ -40,4 +40,7 @@ extern mutex mtx_currentTime;
 // Condition variable to notify scheduler or threads when the ready queue has been updated
 extern condition_variable cv_readyQueue;
 
+//global counter to count excuted processes
+extern int processCounter;
+
 #endif

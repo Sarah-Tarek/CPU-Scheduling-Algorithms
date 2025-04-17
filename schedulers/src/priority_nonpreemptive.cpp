@@ -45,6 +45,7 @@ void Priority_NonPreemptive() {
 
      current = pq.top();
      pq.pop();
+     processCounter++;
      
      while (current.remainingTime != 0)
      {

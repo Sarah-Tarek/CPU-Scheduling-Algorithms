@@ -34,3 +34,6 @@ mutex mtx_currentTime;
 // Condition variable to signal scheduler thread when the ready queue is updated (e.g., a new process is added)
 condition_variable cv_readyQueue;
 
+//processes counter
+int processCounter = 0;
+
