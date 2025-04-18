@@ -1,5 +1,5 @@
-//#include "global_variables.h"
-#include "../header_files/global_variables.h"
+#include "global_variables.h"
+//#include "../header_files/global_variables.h"
 
 // Queue to hold processes that are ready to be scheduled
 queue<Process> readyQueue;
@@ -16,8 +16,10 @@ int totalWaitingTime = 0;
 
 // Accumulates the total turnaround time of all processes (used for average turnaround time calculation)
 int totalTurnaroundTime = 0;
+
 // Queue to hold processes that are yet to be moved to the ready queue
-queue<Process> jobQueue;
+std::priority_queue<Process, std::vector<Process>, CompareArrival> jobQueue;
+
 
 // Mutex to protect the ready queue during concurrent access (e.g., scheduler and process addition threads)
 mutex mtx_readyQueue;
@@ -33,6 +35,7 @@ mutex mtx_currentTime;
 
 // Condition variable to signal scheduler thread when the ready queue is updated (e.g., a new process is added)
 condition_variable cv_readyQueue;
+
 
 //processes counter
 int processCounter = 0;
