@@ -7,28 +7,19 @@
 #include <thread>
 #include <mutex>
 #include <chrono>
+#include "priority_preemptive.h"
 using namespace std;
 
 
-mutex mtx_readyQueue;
-mutex mtx_table;
-mutex mtx_jobQueue;
-mutex mtx_currentTime;
-
-condition_variable cv_readyQueue;
-
-queue<Process> jobQueue;
-
-
-// Function to print the execution log of processes from the table (for test)
-void printTable(unordered_map<int, Process> table) {
-    for (const auto& entry : table) {
-        cout << "at time = " << entry.first 
-            << ", the running process is " << entry.second.id 
-            << " with priority = " << entry.second.priority << endl;
-    }
-}
-
+//// Function to print the execution log of processes from the table (for test)
+//void printTable(unordered_map<int, Process> table) {
+//    for (const auto& entry : table) {
+//        cout << "at time = " << entry.first 
+//            << ", the running process is " << entry.second.id 
+//            << " with priority = " << entry.second.priority << endl;
+//    }
+//}
+//
 
 
 //for test
@@ -127,90 +118,91 @@ void priority_preemptive() {
 
 }
 
-
-// Function to continuously print the live table of process execution
-void printTableLive() {
-    // Infinite loop to keep the table updated in real-time
-    while (true) {
-        // Lock the table mutex to ensure thread-safe access to the shared 'table'
-        lock_guard<mutex> lock(mtx_table);
-
-        // Check if the table contains any entries (if there's any process execution data to print)
-        if (table.size() != 0) {
-            // Loop through each entry in the table
-            for (const auto& entry : table) {
-                // Print the current time, running process ID, and its priority
-                cout << "at time = " << entry.first
-                    << ", the running process is " << entry.second.id
-                    << " with priority = " << entry.second.priority << endl;
-
-                // Sleep for 1 second between prints (to simulate live update every second)
-                this_thread::sleep_for(std::chrono::seconds(1));
-            }
-
-            // After printing all entries, clear the table to prepare for the next cycle
-            table.clear();
-        }
-    }
-}
-
-
+//
+//// Function to continuously print the live table of process execution
+//void printTableLive() {
+//    // Infinite loop to keep the table updated in real-time
+//    while (true) {
+//        // Lock the table mutex to ensure thread-safe access to the shared 'table'
+//        lock_guard<mutex> lock(mtx_table);
+//
+//        // Check if the table contains any entries (if there's any process execution data to print)
+//        if (table.size() != 0) {
+//            // Loop through each entry in the table
+//            for (const auto& entry : table) {
+//                // Print the current time, running process ID, and its priority
+//                cout << "at time = " << entry.first
+//                    << ", the running process is " << entry.second.id
+//                    << " with priority = " << entry.second.priority << endl;
+//
+//                // Sleep for 1 second between prints (to simulate live update every second)
+//                this_thread::sleep_for(std::chrono::seconds(1));
+//            }
+//
+//            // After printing all entries, clear the table to prepare for the next cycle
+//            table.clear();
+//        }
+//    }
+//}
 
 
-// Function to add processes to the ready queue when their arrival time matches the current time
-void addToReadyQueue() {
-    // Infinite loop to continuously check and add processes to the ready queue
-    while (true) {
-        // Lock the jobQueue mutex to ensure thread-safe access to the shared 'jobQueue'
-        lock_guard<mutex> lock1(mtx_jobQueue);
 
-        // Lock the currentTime mutex to safely access the global 'currentTime' variable
-        lock_guard<mutex> lock2(mtx_currentTime);
-
-        // Check if there are processes in the job queue and if the arrival time matches the current time
-        if (!jobQueue.empty() && (jobQueue.front().arrivalTime == currentTime)) {
-            // Get the process at the front of the job queue
-            Process readyProcess = jobQueue.front();
-
-            // Remove the process from the job queue
-            jobQueue.pop();
-
-            // Lock the readyQueue mutex to ensure thread-safe access to the 'readyQueue'
-            {
-                lock_guard<mutex> lock3(mtx_readyQueue);
-
-                // Add the process to the ready queue
-                readyQueue.push(readyProcess);
-            }
-
-            // Notify the scheduler that a new process is available in the ready queue
-            cv_readyQueue.notify_one();
-        }
-    }
-}
+//
+//// Function to add processes to the ready queue when their arrival time matches the current time
+//void addToReadyQueue() {
+//    // Infinite loop to continuously check and add processes to the ready queue
+//    while (true) {
+//        // Lock the jobQueue mutex to ensure thread-safe access to the shared 'jobQueue'
+//        lock_guard<mutex> lock1(mtx_jobQueue);
+//
+//        // Lock the currentTime mutex to safely access the global 'currentTime' variable
+//        lock_guard<mutex> lock2(mtx_currentTime);
+//
+//        // Check if there are processes in the job queue and if the arrival time matches the current time
+//        if (!jobQueue.empty() && (jobQueue.front().arrivalTime == currentTime)) {
+//            // Get the process at the front of the job queue
+//            Process readyProcess = jobQueue.front();
+//
+//            // Remove the process from the job queue
+//            jobQueue.pop();
+//
+//            // Lock the readyQueue mutex to ensure thread-safe access to the 'readyQueue'
+//            {
+//                lock_guard<mutex> lock3(mtx_readyQueue);
+//
+//                // Add the process to the ready queue
+//                readyQueue.push(readyProcess);
+//            }
+//
+//            // Notify the scheduler that a new process is available in the ready queue
+//            cv_readyQueue.notify_one();
+//        }
+//    }
+//}
 
 //test 
-int main()
-{
-    Process p1("p1", 0, 3);
-    p1.priority = 3;
-    Process p2("p2", 1, 4);
-    p2.priority = 2;
-    Process p3("p3", 2, 2);
-    p3.priority = 1;
-
-
-
-    jobQueue.push(p1);
-    jobQueue.push(p2);
-    jobQueue.push(p3);
-
-
-    thread t3(addToReadyQueue);
-    thread t1(priority_preemptive);
-    thread t2(printTableLive);
-    
-    t1.join();
-    t2.join();
-    t3.join();
-}
+// 
+//int main()
+//{
+//    Process p1("p1", 0, 3);
+//    p1.priority = 3;
+//    Process p2("p2", 1, 4);
+//    p2.priority = 3;
+//    Process p3("p3", 2, 2);
+//    p3.priority = 1;
+//
+//
+//
+//    jobQueue.push(p1);
+//    jobQueue.push(p2);
+//    jobQueue.push(p3);
+//
+//
+//    thread t3(addToReadyQueue);
+//    thread t1(priority_preemptive);
+//    thread t2(printTableLive);
+//    
+//    t1.join();
+//    t2.join();
+//    t3.join();
+//}
