@@ -13,61 +13,26 @@
 
 using namespace std;
 
-/* mutex mtx_readyQueue;
-mutex mtx_table;
-mutex mtx_jobQueue;
-mutex mtx_currentTime;
-
-condition_variable cv_readyQueue;
-
-queue<Process> jobQueue; */
-
 void roundRobin() {
     while (true) {
-        // --- Step 1: Copy processes from the global readyQueue into a local vector ---
-        vector<Process> localProcesses;
+        // Copy processes from the global readyQueue into a local queue
+        queue<Process> localQueue;
         {
             unique_lock<mutex> lock(mtx_readyQueue);
             // Wait briefly for new processes to arrive.
             cv_readyQueue.wait_for(lock, chrono::seconds(1));
             while (!readyQueue.empty()) {
-                localProcesses.push_back(readyQueue.front());
+                localQueue.push(readyQueue.front());
                 readyQueue.pop();
             }
         }
         
         // If we found any processes in the global readyQueue, process them.
-        if (!localProcesses.empty()) {
-            // --- Step 2: Sort the local vector by arrival time (ascending) ---
-            sort(localProcesses.begin(), localProcesses.end(), CompareArrivalTimeAscending());
-            
-            // --- Step 3: Transfer the sorted processes into a local FIFO queue ---
-            queue<Process> localQueue;
-            for (auto &proc : localProcesses) {
-                localQueue.push(proc);
-            }
-            
-            // --- Step 4: Process the local queue ---
+        if (!localQueue.empty()) {
+            // Process the local queue
             while (!localQueue.empty()) {
                 Process currentProcess = localQueue.front();
                 localQueue.pop();
-                
-                // If the process has not yet arrived, simulate idle time until it does,
-                // using a default-constructed Process (its id will be "idle").
-                /* while (true) {
-                    {
-                        lock_guard<mutex> lock(mtx_currentTime);
-                        if (currentTime >= currentProcess.arrivalTime)
-                            break;
-                        Process idleProcess;  // Default constructor sets id to "idle"
-                        {
-                            lock_guard<mutex> lockTable(mtx_table);
-                            table[currentTime] = idleProcess;
-                        }
-                        currentTime++;
-                    }
-                    this_thread::sleep_for(chrono::seconds(1));
-                } */
                 
                 // Obtain the allowed quantum from currentProcess.
                 int allowedQuantum = currentProcess.quantum;
@@ -91,7 +56,7 @@ void roundRobin() {
                 //currentProcess.remainingTime -= runtime;
                 
                 if (currentProcess.remainingTime == 0) {
-                    processCounter++;
+                    //processCounter++;
                     //cout << "\nProcess Counter: " << processCounter << "\n\n";
 
                     // Process finished: update finish time and compute statistics.

@@ -12,9 +12,9 @@ void addToReadyQueue() {
         lock_guard<mutex> lock2(mtx_currentTime);
 
         // check if there are processes in the job queue and if the arrival time matches the current time
-        if (!jobQueue.empty() && (jobQueue.front().arrivalTime == currentTime)) {
+        if (!jobQueue.empty() && (jobQueue.top().arrivalTime == currentTime)) {
             // get the process at the front of the job queue
-            Process readyProcess = jobQueue.front();
+            Process readyProcess = jobQueue.top();
 
             // remove the process from the job queue
             jobQueue.pop();
