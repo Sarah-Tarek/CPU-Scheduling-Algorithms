@@ -52,8 +52,16 @@ void roundRobin() {
                         currentTime++;
                     }
                     this_thread::sleep_for(chrono::seconds(1));
+
+                    // Every tick, pull in any arrivals into localQueue
+                    {
+                        lock_guard<mutex> lock(mtx_readyQueue);
+                        while (!readyQueue.empty()) {
+                            localQueue.push(readyQueue.front());
+                            readyQueue.pop();
+                        }
+                    }
                 }
-                //currentProcess.remainingTime -= runtime;
                 
                 if (currentProcess.remainingTime == 0) {
                     //processCounter++;
@@ -156,20 +164,20 @@ void printTableLive() {
 int main() {
     int allowedQuantum = 3;
     
-    // Test 1:
+    /* // Test 1:
     Process p1("P1", 0, 3);  // t=0-2
     Process p2("P2", 1, 4);  // t=3-5 t=8
-    Process p3("P3", 2, 2);  // t=6-7
+    Process p3("P3", 2, 2);  // t=6-7 */
 
     /* // Test 2:
     Process p1("P1", 0, 5);  // t=0-2 t=8-9
     Process p2("P2", 0, 4);  // t=3-5 t=10
     Process p3("P3", 0, 2);  // t=6-7 */
 
-    /* // Test 3:
+    // Test 3:
     Process p1("P1", 0, 3);  // t=0-2
     Process p2("P2", 1, 4);  // t=3-6
-    Process p3("P3", 8, 2);  // t=8-9 */
+    Process p3("P3", 8, 2);  // t=8-9
 
     /* // Test 4:
     Process p1("P1", 1, 2);  // t=3-4
