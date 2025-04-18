@@ -7,15 +7,14 @@
 #include <thread>
 #include <mutex>
 #include <chrono>
-#include "priority_preemptive.h"
 using namespace std;
 
 
 //// Function to print the execution log of processes from the table (for test)
 //void printTable(unordered_map<int, Process> table) {
 //    for (const auto& entry : table) {
-//        cout << "at time = " << entry.first 
-//            << ", the running process is " << entry.second.id 
+//        cout << "at time = " << entry.first
+//            << ", the running process is " << entry.second.id
 //            << " with priority = " << entry.second.priority << endl;
 //    }
 //}
@@ -31,7 +30,7 @@ void priority_preemptive() {
 
     // Priority queue to manage ready processes based on their priority
     priority_queue<Process, vector<Process>, CompareProcessPriority> myPriorityQueue;
-    
+
     //change to while(!q.empty()) to test
     // Main scheduling loop (infinite until manually stopped or a condition is added)
     while (true) {
@@ -51,7 +50,7 @@ void priority_preemptive() {
                 readyQueue.pop();
             }
         }
-        
+
         // Declare a variable to store the currently running process
         Process currentProcess;
 
@@ -72,7 +71,10 @@ void priority_preemptive() {
             else {
 
                 // Process has completed execution
-
+                {
+                    lock_guard<std::mutex> lock(mtx_processCounter);
+                    processCounter++;
+                }
                 // Set finish time to current time + 1 since we executed one unit
                 currentProcess.finishTime = currentTime + 1;
 
@@ -88,7 +90,7 @@ void priority_preemptive() {
                 //for test
                 //q.pop();
             }
-            
+
         }
         else {
 
@@ -110,11 +112,11 @@ void priority_preemptive() {
             lock_guard<mutex> lock2(mtx_currentTime);
             currentTime++;
         }
-        
+
 
     }
     //for test
-   // printTable(table);
+    // printTable(table);
 
 }
 
@@ -180,8 +182,8 @@ void priority_preemptive() {
 //    }
 //}
 
-//test 
-// 
+//test
+//
 //int main()
 //{
 //    Process p1("p1", 0, 3);
@@ -201,8 +203,9 @@ void priority_preemptive() {
 //    thread t3(addToReadyQueue);
 //    thread t1(priority_preemptive);
 //    thread t2(printTableLive);
-//    
+//
 //    t1.join();
 //    t2.join();
 //    t3.join();
 //}
+
