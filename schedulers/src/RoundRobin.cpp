@@ -36,9 +36,12 @@ void roundRobin() {
                 
                 // Obtain the allowed quantum from currentProcess.
                 int allowedQuantum = currentProcess.quantum;
+                
                 // Determine runtime: run for the full quantum if possible; else, run for the remaining time.
                 int runtime = (currentProcess.remainingTime >= allowedQuantum) ? allowedQuantum : currentProcess.remainingTime;
                 
+                if (runtime == 0) runtime = 1;  // force progress
+
                 // Execute the process for 'runtime' consecutive time units.
                 for (int i = 0; i < runtime; i++) {
                     currentProcess.remainingTime--;
