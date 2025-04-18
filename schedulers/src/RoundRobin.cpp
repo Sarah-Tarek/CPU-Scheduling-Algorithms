@@ -8,20 +8,19 @@
 #include <condition_variable>
 #include "process.h"
 #include "global_variables.h"
-#include "RoundRoubin.h"
+#include "roundrobin.h"
+#include "job_to_ready.h"
 
 using namespace std;
 
-mutex mtx_readyQueue;
+/* mutex mtx_readyQueue;
 mutex mtx_table;
 mutex mtx_jobQueue;
 mutex mtx_currentTime;
 
 condition_variable cv_readyQueue;
 
-queue<Process> jobQueue;
-
-
+queue<Process> jobQueue; */
 
 void roundRobin() {
     while (true) {
@@ -77,6 +76,8 @@ void roundRobin() {
                 
                 // Execute the process for 'runtime' consecutive time units.
                 for (int i = 0; i < runtime; i++) {
+                    currentProcess.remainingTime--;
+
                     {
                         lock_guard<mutex> lock(mtx_currentTime);
                         {
@@ -87,13 +88,16 @@ void roundRobin() {
                     }
                     this_thread::sleep_for(chrono::seconds(1));
                 }
-                currentProcess.remainingTime -= runtime;
+                //currentProcess.remainingTime -= runtime;
                 
                 if (currentProcess.remainingTime == 0) {
                     // Process finished: update finish time and compute statistics.
                     currentProcess.finishTime = currentTime;
                     currentProcess.turnaroundTime = currentProcess.finishTime - currentProcess.arrivalTime;
                     currentProcess.waitingTime = currentProcess.turnaroundTime - currentProcess.burstTime;
+                    
+                    processCounter++;
+                    //cout << "\nProcess Counter: " << processCounter << "\n\n";
                 }
                 else {
                     // Process did not finish:
@@ -125,9 +129,7 @@ void roundRobin() {
     } // End outer infinite loop.
 }
 
-
-
-
+/* 
 // Function to add processes to the ready queue when their arrival time matches the current time
 void addToReadyQueue() {
     // Infinite loop to continuously check and add processes to the ready queue
@@ -159,8 +161,7 @@ void addToReadyQueue() {
         }
     }
 }
-
-
+ */
 
 // Function to continuously print the live table of process execution
 void printTableLive() {
@@ -186,9 +187,6 @@ void printTableLive() {
         }
     }
 }
-
-
-
 
 int main() {
     int allowedQuantum = 3;
