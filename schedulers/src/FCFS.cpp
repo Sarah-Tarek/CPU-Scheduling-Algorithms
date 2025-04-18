@@ -50,7 +50,8 @@ void FCFS() { //max_time for test change for void in the main function//void FCF
             else {
 
                 // Process has completed execution
-
+                processCounter++;
+                
                 // Set finish time to current time + 1 since we executed one unit
                 currentProcess.finishTime = currentTime + 1;
 
