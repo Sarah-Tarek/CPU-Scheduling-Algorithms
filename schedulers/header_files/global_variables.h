@@ -2,10 +2,16 @@
 #define _GLOBAL_VARIABLES_
 
 #include <queue>
-#include "process.h" 
+#include "process.h"
 #include <unordered_map>
 #include<mutex>
 #include <condition_variable>
+
+struct CompareArrival {
+    bool operator()(const Process& a, const Process& b) {
+        return a.arrivalTime > b.arrivalTime; // min-heap: least arrivalTime first
+    }
+};
 // Queue to hold processes that are ready to be scheduled
 extern queue<Process> readyQueue;
 
@@ -23,7 +29,7 @@ extern int totalWaitingTime;
 extern int totalTurnaroundTime;
 
 // Queue holding incoming jobs before they're moved to the ready queue
-extern queue<Process> jobQueue;
+extern std::priority_queue<Process, std::vector<Process>, CompareArrival> jobQueue;
 
 // Mutex to protect access to the ready queue (used when scheduling or adding processes)
 extern mutex mtx_readyQueue;
