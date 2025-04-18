@@ -8,7 +8,7 @@
 #include <condition_variable>
 #include "process.h"
 #include "global_variables.h"
-#include "roundrobin.h"
+#include "RoundRobin.h"
 #include "job_to_ready.h"
 
 using namespace std;
@@ -91,13 +91,13 @@ void roundRobin() {
                 //currentProcess.remainingTime -= runtime;
                 
                 if (currentProcess.remainingTime == 0) {
+                    processCounter++;
+                    //cout << "\nProcess Counter: " << processCounter << "\n\n";
+
                     // Process finished: update finish time and compute statistics.
                     currentProcess.finishTime = currentTime;
                     currentProcess.turnaroundTime = currentProcess.finishTime - currentProcess.arrivalTime;
                     currentProcess.waitingTime = currentProcess.turnaroundTime - currentProcess.burstTime;
-                    
-                    processCounter++;
-                    //cout << "\nProcess Counter: " << processCounter << "\n\n";
                 }
                 else {
                     // Process did not finish:
