@@ -33,6 +33,9 @@ mutex mtx_jobQueue;
 // Mutex to safely read/write the shared current time variable used by the scheduler
 mutex mtx_currentTime;
 
+// Mutex to safely increment the shared process counter variable
+mutex mtx_processCounter;
+
 // Condition variable to signal scheduler thread when the ready queue is updated (e.g., a new process is added)
 condition_variable cv_readyQueue;
 

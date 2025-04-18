@@ -43,6 +43,9 @@ extern mutex mtx_jobQueue;
 // Mutex to protect access to the shared current time variable used by the scheduler
 extern mutex mtx_currentTime;
 
+// Mutex to protect access to the shared process counter variable
+extern mutex mtx_processCounter;
+
 // Condition variable to notify scheduler or threads when the ready queue has been updated
 extern condition_variable cv_readyQueue;
 
