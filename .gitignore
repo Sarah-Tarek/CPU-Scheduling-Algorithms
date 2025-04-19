@@ -78,7 +78,6 @@ qrc_*.cpp
 # Scheduler results / logs (add or tweak as you need)
 *.log
 *.csv
-*.txt
 
 ###############################################################################
 #  Backup & temporary files                                                   #
