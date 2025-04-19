@@ -13,7 +13,7 @@
  * Author: Doaa Said
  *
  ***********************************************************************************************/
-#include "SJF_Preemptive.h"
+#include "sjf_preemptive.h"
 #include"global_variables.h"
 #include<iostream>
 #include <climits>

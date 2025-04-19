@@ -2,7 +2,7 @@
 #include <vector>
 #include "process.h"
 #include "global_variables.h"
-#include"FCFS.h"
+#include"fcfs.h"
 using namespace std;
 
 

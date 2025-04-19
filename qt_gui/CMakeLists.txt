@@ -28,22 +28,22 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
         global_variables.h
         process.h
-        SJF_Preemptive.h
-        FCFS.cpp
+        sjf_preemptive.h
+        fcfs.cpp
         global_variables.cpp
         priority_nonpreemptive.cpp
         priority_preemptive.cpp
-        RoundRobin.cpp
-        SJF_preemptive.cpp
-        SJF_nonpreemptive.cpp
-        SJF_NonPreemptive.h
-        SJF_nonpreemptive.cpp
+        round_robin.cpp
+        sjf_preemptive.cpp
+        sjf_nonpreemptive.cpp
+        sjf_nonpreemptive.h
+        sjf_nonpreemptive.cpp
         priority_nonpreemptive.h
         priority_preemptive.h
         job_to_ready.h
         job_to_ready.cpp
-        FCFS.h
-        RoundRoubin.h
+        fcfs.h
+        round_robin.h
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET CPUScheduler APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

@@ -1,15 +1,11 @@
-#include <iostream>
 #include <queue>
-#include <vector>
-#include <algorithm>
 #include <thread>
 #include <mutex>
 #include <chrono>
 #include <condition_variable>
 #include "process.h"
 #include "global_variables.h"
-#include "RoundRoubin.h"
-#include "job_to_ready.h"
+#include "round_robin.h"
 
 using namespace std;
 

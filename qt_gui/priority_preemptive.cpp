@@ -1,10 +1,8 @@
-#include <iostream>
 #include <queue>
 #include <vector>
 #include <unordered_map>
 #include "process.h"
 #include "global_variables.h"
-#include <thread>
 #include <mutex>
 #include <chrono>
 using namespace std;
