@@ -4,20 +4,18 @@
 #include <vector>
 #include <thread>
 #include <chrono>
-#include "SJF_nonpreemptive.h"
+#include "sjf_nonpreemptive.h"
 using namespace std;
-
-
 
 void SJF_NonPreemptive() {
 
     priority_queue<Process, vector<Process>, CompareBurst> pq;
-    
+
     while (true) {
         {
             lock_guard<mutex> lock1(mtx_readyQueue);
             lock_guard<mutex> lock2(mtx_jobQueue);
-    
+
             // Exit only when all queues are empty (no jobs to arrive or run)
             if (readyQueue.empty() && jobQueue.empty() && pq.empty())
                 break;
@@ -47,7 +45,7 @@ void SJF_NonPreemptive() {
         current = pq.top();
         pq.pop();
         processCounter++;
-        
+
         while (current.remainingTime != 0)
         {
             current.remainingTime --;
@@ -62,7 +60,7 @@ void SJF_NonPreemptive() {
                 table[currentTime] = current;
             }
 
-            //this_thread::sleep_for(std::chrono::milliseconds(100)); 
+            //this_thread::sleep_for(std::chrono::milliseconds(100));
 
             if(current.remainingTime == 0){
                 current.finishTime = currentTime ;
@@ -72,9 +70,9 @@ void SJF_NonPreemptive() {
                 totalWaitingTime += current.waitingTime;
                 cout<<"PID: "<<current.id<<"\n"<<"turnaround: "<<current.turnaroundTime<<"\n"<<"waiting: "<<current.waitingTime<<"\n";
                }
-            
-            
-        }  
+
+
+        }
     }
 
     else {
@@ -89,10 +87,10 @@ void SJF_NonPreemptive() {
         // Record the process that is running at this time in the global table
         table[currentTime] = current;
     }
-            
+
     }
     }
-    
+
 }
 
 /*// Function to continuously print the live table of process execution
@@ -134,9 +132,9 @@ void addToReadyQueue() {
         lock_guard<mutex> lock2(mtx_currentTime);
 
         // Check if there are processes in the job queue and if the arrival time matches the current time
-        if (!jobQueue.empty() && (jobQueue.front().arrivalTime == currentTime)) {
+        if (!jobQueue.empty() && (jobQueue.top().arrivalTime == currentTime)) {
             // Get the process at the front of the job queue
-            Process readyProcess = jobQueue.front();
+            Process readyProcess = jobQueue.top();
 
             // Remove the process from the job queue
             jobQueue.pop();
@@ -158,7 +156,7 @@ void addToReadyQueue() {
     }
 }
 
-/*//test 
+/*//test
 int main()
 {
     Process p1("p1", 0, 3);
@@ -175,7 +173,7 @@ int main()
     thread t3(addToReadyQueue);
     thread t1(SJF_NonPreemptive);
     thread t2(printTableLive);
-    
+
     t1.join();
     t2.join();
     t3.join();
@@ -183,8 +181,8 @@ int main()
 
 //test
 int main() {
-    
-    Process p1("p1",0,5); //id arrival burst 
+
+    Process p1("p1",0,5); //id arrival burst
     Process p2("p2",0,8);
     Process p3("p3",0,5);
     Process p4("p4",0,3);
@@ -194,7 +192,7 @@ int main() {
     readyQueue.push(p3);
     readyQueue.push(p4);
 
-    SJF_NonPreemptive();  
+    SJF_NonPreemptive();
 
     cout<<"total turn: "<<totalTurnaroundTime<<"\n"<<"total wait: "<<totalWaitingTime<<"\n";
     return 0;

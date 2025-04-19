@@ -2,15 +2,15 @@
 #include <vector>
 #include "process.h"
 #include "global_variables.h"
-#include"FCFS.h"
+#include"fcfs.h"
 using namespace std;
 
 
 /*// Function to print the execution log of processes from the table (for test)
 void printTable(unordered_map<int, Process> table) {
     for (const auto& entry : table) {
-        cout << "at time = " << entry.first 
-            << ", the running process is " << entry.second.id 
+        cout << "at time = " << entry.first
+            << ", the running process is " << entry.second.id
             << " with priority = " << entry.second.priority << endl;
     }
 }*/
@@ -36,7 +36,7 @@ void FCFS() { //max_time for test change for void in the main function//void FCF
         }
 
         if (!arrivalQueue.empty()) {
-            
+
             Process currentProcess = arrivalQueue.top();
             arrivalQueue.pop();
 
@@ -51,7 +51,7 @@ void FCFS() { //max_time for test change for void in the main function//void FCF
 
                 // Process has completed execution
                 processCounter++;
-                
+
                 // Set finish time to current time + 1 since we executed one unit
                 currentProcess.finishTime = currentTime + 1;
 
@@ -64,12 +64,12 @@ void FCFS() { //max_time for test change for void in the main function//void FCF
                 totalWaitingTime += currentProcess.waitingTime;
 
 
-    
+
             }
 
             // Record the process running at this time
             unique_lock<mutex> lock(mtx_table);
-            table[currentTime] = currentProcess;    
+            table[currentTime] = currentProcess;
         }
         else {
 
@@ -85,12 +85,12 @@ void FCFS() { //max_time for test change for void in the main function//void FCF
 
 //test
 
-/*int main () { 
+/*int main () {
         Process p1("p1",0,6);
         Process p2("p2",2,4);
         Process p3("p3",3,3);
         Process p4("p4",1,1);
-    
+
         readyQueue.push(p1);
         readyQueue.push(p2);
         readyQueue.push(p3);
@@ -98,7 +98,7 @@ void FCFS() { //max_time for test change for void in the main function//void FCF
         FCFS(15);  // simulate 15 time units
 
         printTable(table); //  print the log
-    
+
         cout << "Total Turnaround Time: " << totalTurnaroundTime << "\n";
         cout << "Total Waiting Time: " << totalWaitingTime << "\n";
     }*/

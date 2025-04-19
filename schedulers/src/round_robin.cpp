@@ -8,7 +8,7 @@
 #include <condition_variable>
 #include "process.h"
 #include "global_variables.h"
-#include "RoundRobin.h"
+#include "round_robin.h"
 #include "job_to_ready.h"
 
 using namespace std;
@@ -26,20 +26,20 @@ void roundRobin() {
                 readyQueue.pop();
             }
         }
-        
+
         // If we found any processes in the global readyQueue, process them.
         if (!localQueue.empty()) {
             // Process the local queue
             while (!localQueue.empty()) {
                 Process currentProcess = localQueue.front();
                 localQueue.pop();
-                
+
                 // Obtain the allowed quantum from currentProcess.
                 int allowedQuantum = currentProcess.quantum;
-                
+
                 // Determine runtime: run for the full quantum if possible; else, run for the remaining time.
                 int runtime = (currentProcess.remainingTime >= allowedQuantum) ? allowedQuantum : currentProcess.remainingTime;
-                
+
                 if (runtime == 0) runtime = 1;  // force progress
 
                 // Execute the process for 'runtime' consecutive time units.
@@ -65,7 +65,7 @@ void roundRobin() {
                         }
                     }
                 }
-                
+
                 if (currentProcess.remainingTime == 0) {
                     //processCounter++;
                     //cout << "\nProcess Counter: " << processCounter << "\n\n";
@@ -105,7 +105,7 @@ void roundRobin() {
     } // End outer infinite loop.
 }
 
-/* 
+/*
 // Function to add processes to the ready queue when their arrival time matches the current time
 void addToReadyQueue() {
     // Infinite loop to continuously check and add processes to the ready queue
@@ -166,7 +166,7 @@ void printTableLive() {
 
 int main() {
     int allowedQuantum = 3;
-    
+
     /* // Test 1:
     Process p1("P1", 0, 3);  // t=0-2
     Process p2("P2", 1, 4);  // t=3-5 t=8
@@ -186,7 +186,7 @@ int main() {
     Process p1("P1", 1, 2);  // t=3-4
     Process p2("P2", 0, 5);  // t=0-2 t=8-9
     Process p3("P3", 1, 8);  // t=5-7 t=10-15 */
-    
+
     // Set each process's quantum field.
     p1.quantum = allowedQuantum;
     p2.quantum = allowedQuantum;
@@ -199,10 +199,10 @@ int main() {
     thread t3(addToReadyQueue);
     thread t1(roundRobin);
     thread t2(printTableLive);
-    
+
     t1.join();
     t2.join();
     t3.join();
-    
+
     return 0;
 }
