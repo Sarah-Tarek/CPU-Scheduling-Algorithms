@@ -1,5 +1,5 @@
 ###############################################################################
-#  General                                                                   #
+#  General                                                                    #
 ###############################################################################
 # macOS / Windows desktop clutter
 .DS_Store
@@ -16,7 +16,7 @@ Desktop.ini
 *.code-workspace
 
 ###############################################################################
-#  C++ / GCC / Clang                                                         #
+#  C++ / GCC / Clang                                                          #
 ###############################################################################
 # Object & dependency files
 *.o
@@ -35,13 +35,19 @@ Desktop.ini
 *.out
 
 ###############################################################################
-#  CMake                                                                     #
+#  CMake / Qt build directories (any depth)                                   #
 ###############################################################################
-# Out‑of‑source build directories
-/build*
-/cmake-build-*
-/Debug
-/Release
+# Typical out‑of‑source build folders
+build*/
+*/build*/
+build-*/
+*/build-*/
+cmake-build-*/
+*/cmake-build-*/
+Debug/
+Release/
+*/Debug/
+*/Release/
 
 # In‑source CMake artefacts
 CMakeCache.txt
@@ -51,9 +57,8 @@ Makefile
 install_manifest.txt
 
 ###############################################################################
-#  Qt / Qt Creator                                                           #
+#  Qt Creator‑specific files                                                  #
 ###############################################################################
-# Creator‑specific settings
 *.user
 *.autosave
 *.creator*
@@ -61,22 +66,22 @@ install_manifest.txt
 *.qmlproject.user
 *.qmake.stash
 
-# Generated code
+# Generated Qt files
 moc_*.cpp
 moc_*.h
 ui_*.h
 qrc_*.cpp
 
 ###############################################################################
-#  Project‑specific                                                           #
+#  Project‑specific artefacts                                                 #
 ###############################################################################
-# Scheduler results / logs (add your own patterns if you print to files)
+# Scheduler results / logs (add or tweak as you need)
 *.log
 *.csv
 *.txt
 
 ###############################################################################
-#  Backup & temp                                                              #
+#  Backup & temporary files                                                   #
 ###############################################################################
 *.bak
 *.tmp

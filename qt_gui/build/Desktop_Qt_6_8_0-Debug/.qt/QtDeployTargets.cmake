@@ -1,2 +1,0 @@
-set(__QT_DEPLOY_TARGET_CPUScheduler_FILE /home/mahmoud/Downloads/CPUScheduler/build/Desktop_Qt_6_8_0-Debug/CPUScheduler)
-set(__QT_DEPLOY_TARGET_CPUScheduler_TYPE EXECUTABLE)
