@@ -13,12 +13,12 @@ void Priority_NonPreemptive()
 
     while (true) {
         // 1) Exit if there's nothing left to arrive or run
-        {
+       /* {
             std::lock_guard<std::mutex> readyLock(mtx_readyQueue);
             std::lock_guard<std::mutex> jobLock(mtx_jobQueue);
             if (readyQueue.empty() && jobQueue.empty() && pq.empty())
                 break;
-        }
+        }*/
 
         // 2) Drain newly‐ready jobs into local pq
         {
@@ -41,12 +41,12 @@ void Priority_NonPreemptive()
                 current.remainingTime--;
 
                 {
-                    std::lock_guard<std::mutex> timeLock(mtx_currentTime);
-                    currentTime++;
+                    lock_guard<mutex> lock(mtx_table);
+                    table[currentTime] = current;
                 }
                 {
-                    std::lock_guard<std::mutex> tableLock(mtx_table);
-                    table[currentTime] = current;
+                    lock_guard<mutex> lock2(mtx_currentTime);
+                    currentTime++;
                 }
 
                 // give GUI & other threads breathing room
@@ -61,15 +61,19 @@ void Priority_NonPreemptive()
             totalWaitingTime      += current.waitingTime;
         }
         else {
+
+
+            {
+                std::lock_guard<std::mutex> tableLock(mtx_table);
+                table[currentTime] = Process();  // idle marker
+            }
+            // 6) Idle tick if nothing ready
             // 6) Idle tick if nothing ready
             {
                 std::lock_guard<std::mutex> timeLock(mtx_currentTime);
                 currentTime++;
             }
-            {
-                std::lock_guard<std::mutex> tableLock(mtx_table);
-                table[currentTime] = Process();  // idle marker
-            }
+
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
     }
