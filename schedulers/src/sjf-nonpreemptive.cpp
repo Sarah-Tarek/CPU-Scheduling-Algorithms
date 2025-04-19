@@ -4,7 +4,9 @@
 #include <vector>
 #include <thread>
 #include <chrono>
-#include "sjf_nonpreemptive.h"
+//#include "SJF_nonpreemptive.h"
+//#include "job_to_ready.h"
+
 using namespace std;
 
 void SJF_NonPreemptive() {
@@ -68,7 +70,7 @@ void SJF_NonPreemptive() {
                 totalTurnaroundTime += current.turnaroundTime;
                 current.waitingTime = current.turnaroundTime - current.burstTime;
                 totalWaitingTime += current.waitingTime;
-                cout<<"PID: "<<current.id<<"\n"<<"turnaround: "<<current.turnaroundTime<<"\n"<<"waiting: "<<current.waitingTime<<"\n";
+                //cout<<"PID: "<<current.id<<"\n"<<"turnaround: "<<current.turnaroundTime<<"\n"<<"waiting: "<<current.waitingTime<<"\n";
                }
 
 
@@ -93,7 +95,7 @@ void SJF_NonPreemptive() {
 
 }
 
-/*// Function to continuously print the live table of process execution
+// Function to continuously print the live table of process execution
 void printTableLive() {
     // Infinite loop to keep the table updated in real-time
     while (true) {
@@ -116,7 +118,7 @@ void printTableLive() {
             table.clear();
         }
     }
-}*/
+}
 
 
 
@@ -156,7 +158,8 @@ void addToReadyQueue() {
     }
 }
 
-/*//test
+
+//test 
 int main()
 {
     Process p1("p1", 0, 3);
@@ -179,7 +182,7 @@ int main()
     t3.join();
 }
 
-//test
+/*//test
 int main() {
 
     Process p1("p1",0,5); //id arrival burst
