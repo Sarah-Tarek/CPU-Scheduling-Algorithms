@@ -44,14 +44,12 @@ void SJF_NonPreemptive() {
             {
                 current.remainingTime --;
                 {
+                    lock_guard<mutex> lock(mtx_table);
+                    table[currentTime] = current;
+                }
+                {
                     lock_guard<mutex> lock2(mtx_currentTime);
                     currentTime++;
-                }
-
-                {
-                    lock_guard<mutex> lock(mtx_table);
-                    // Record the process that is running at this time in the global table
-                    table[currentTime] = current;
                 }
 
                 //this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -72,14 +70,12 @@ void SJF_NonPreemptive() {
         else {
             current = Process();  //idle
             {
+                lock_guard<mutex> lock(mtx_table);
+                table[currentTime] = current;
+            }
+            {
                 lock_guard<mutex> lock2(mtx_currentTime);
                 currentTime++;
-            }
-            // Lock the table mutex to safely access the shared table where we record running processes
-            {
-                lock_guard<mutex> lock(mtx_table);
-                // Record the process that is running at this time in the global table
-                table[currentTime] = current;
             }
 
         }
