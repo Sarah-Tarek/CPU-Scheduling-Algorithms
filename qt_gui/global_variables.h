@@ -48,5 +48,6 @@ extern condition_variable cv_readyQueue;
 
 extern int processCounter ;
 extern mutex mtx_processCounter;
-
+extern bool nonLiveFlag;
+extern bool finishFlag;
 #endif

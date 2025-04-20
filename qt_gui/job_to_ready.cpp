@@ -5,6 +5,10 @@
 void addToReadyQueue() {
     // infinite loop to continuously check and add processes to the ready queue
     while (true) {
+        if(nonLiveFlag && jobQueue.empty()){
+            return;
+        }
+
         // lock the jobqueue mutex to ensure thread-safe access to the shared 'jobqueue'
         lock_guard<mutex> lock1(mtx_jobQueue);
 
@@ -30,5 +34,7 @@ void addToReadyQueue() {
             // notify the scheduler that a new process is available in the ready queue
             cv_readyQueue.notify_one();
         }
+
+
     }
 }

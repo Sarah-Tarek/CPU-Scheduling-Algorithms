@@ -3,7 +3,7 @@
 #include "secondwindow.h"
 #include "process.h"
 #include <QMessageBox>
-
+#include "global_variables.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -20,6 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
+
 }
 
 MainWindow::~MainWindow()
@@ -27,8 +28,8 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pushButton_start_clicked()
-{
+
+void MainWindow::show_second_window(){
     secondWindow = new SecondWindow(this);
     secondWindow->show();
 
@@ -44,6 +45,13 @@ void MainWindow::on_pushButton_start_clicked()
 
 
     this->hide();//hide main window
+}
+
+
+void MainWindow::on_pushButton_start_clicked()
+{
+    show_second_window();
+
 }
 
 
@@ -179,4 +187,11 @@ void MainWindow::on_algorithmComboBox_currentTextChanged(const QString &text)
 
 
 
+
+
+void MainWindow::on_nonLiveButton_clicked()
+{
+    nonLiveFlag = true;
+    show_second_window();
+}
 

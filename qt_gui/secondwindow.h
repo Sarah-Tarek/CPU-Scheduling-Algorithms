@@ -53,8 +53,6 @@ private:
     std::thread liveTableThread;
     std::thread schedulerThread;
 
-
-
     void setupLiveTable();
     void fillTable();
     void liveTableChart();

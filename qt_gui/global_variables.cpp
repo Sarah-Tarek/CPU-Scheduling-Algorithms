@@ -38,3 +38,6 @@ condition_variable cv_readyQueue;
 int processCounter = 0;
 
 mutex mtx_processCounter;
+
+bool nonLiveFlag = false;
+bool finishFlag = false;

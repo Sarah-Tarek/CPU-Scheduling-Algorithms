@@ -35,12 +35,22 @@ void priority_preemptive() {
 
         // Transfer all processes from readyQueue into the priority queue
         {
+
             // Lock the readyQueue mutex to safely access the readyQueue
             unique_lock<mutex> lock(mtx_readyQueue);
 
             // Wait for a signal from the condition variable (cv_readyQueue) before continuing
             // to ensure that the ready queue has processes available
             cv_readyQueue.wait_for(lock, std::chrono::seconds(1));
+
+            {
+                std::lock_guard<std::mutex> lock1(mtx_jobQueue);
+                if(nonLiveFlag && jobQueue.empty() && readyQueue.empty() && myPriorityQueue.empty()) {
+                    finishFlag = true;
+                    return;
+                }
+            }
+
 
             // Transfer all processes from the readyQueue to the priority queue
             while (!readyQueue.empty()) {

@@ -70,13 +70,17 @@ void SecondWindow::startSimulation(const QString &algorithm){
         liveTableChart();
     });
 */
+
     // Start thread : Gantt chart via Qt Timer
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &SecondWindow::updateGanttChart);
     timer->start(1000);  // every 1s
 
+
+
     readyQueueThread.detach();
     schedulerThread.detach();
+
 }
 
 void SecondWindow::runAlgorithm(const QString &algorithmName)
@@ -249,6 +253,11 @@ void SecondWindow::liveTableChart() {
 
 void SecondWindow::updateGanttChart()
 {
+
+    if(finishFlag && chartX >= currentTime ){
+        timer->stop();
+    }
+
     std::lock_guard<std::mutex> lock(mtx_table);
 
     if (table.count(chartX)) {
@@ -307,6 +316,10 @@ void SecondWindow::updateGanttChart()
         // Ensure the scene is large enough to accommodate the growing chart
         scene->setSceneRect(0, 0, totalChartWidth, 100);  // Adjust the height as necessary
     }
+
+
+
+
 }
 
 QColor SecondWindow::getColorForProcess(const QString& processName)
