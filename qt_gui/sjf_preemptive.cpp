@@ -19,6 +19,9 @@
 #include <climits>
 #include<algorithm>
 #include<thread>
+#include <QMetaObject>
+#include "secondwindow.h"
+
 using namespace std;
 
 void Sjf_Preemptive_Schedular() {
@@ -89,6 +92,18 @@ void Sjf_Preemptive_Schedular() {
                 // Update the accumulated total waiting time and turnaround time
                 totalWaitingTime += current_process->waitingTime;
                 totalTurnaroundTime += current_process->turnaroundTime;
+
+                double avgT = double(totalTurnaroundTime) / processCounter;
+                double avgW = double(totalWaitingTime)    / processCounter;
+                if (SecondWindow::instance) {
+                    QMetaObject::invokeMethod(
+                        SecondWindow::instance,
+                        "onStatsUpdated",
+                        Qt::QueuedConnection,
+                        Q_ARG(double, avgT),
+                        Q_ARG(double, avgW)
+                        );
+                }
             }
         }
         // Locking table to safely update process state

@@ -4,6 +4,9 @@
 #include <vector>
 #include <thread>
 #include <chrono>
+#include <QMetaObject>
+#include "secondwindow.h"
+
 using namespace std;
 
 
@@ -63,7 +66,18 @@ void SJF_NonPreemptive() {
                     totalTurnaroundTime += current.turnaroundTime;
                     current.waitingTime = current.turnaroundTime - current.burstTime;
                     totalWaitingTime += current.waitingTime;
-                    cout<<"PID: "<<current.id<<"\n"<<"turnaround: "<<current.turnaroundTime<<"\n"<<"waiting: "<<current.waitingTime<<"\n";
+
+                    double avgT = double(totalTurnaroundTime) / processCounter;
+                    double avgW = double(totalWaitingTime)    / processCounter;
+                    if (SecondWindow::instance) {
+                        QMetaObject::invokeMethod(
+                            SecondWindow::instance,
+                            "onStatsUpdated",
+                            Qt::QueuedConnection,
+                            Q_ARG(double, avgT),
+                            Q_ARG(double, avgW)
+                            );
+                    }
                 }
 
 

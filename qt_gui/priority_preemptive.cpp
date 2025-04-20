@@ -5,6 +5,9 @@
 #include "global_variables.h"
 #include <mutex>
 #include <chrono>
+#include <QMetaObject>
+#include "secondwindow.h"
+
 using namespace std;
 
 
@@ -83,6 +86,18 @@ void priority_preemptive() {
                 // Calculate waiting time: turnaround - burst
                 currentProcess.waitingTime = currentProcess.turnaroundTime - currentProcess.burstTime;
                 totalWaitingTime += currentProcess.waitingTime;
+
+                double avgT = double(totalTurnaroundTime) / processCounter;
+                double avgW = double(totalWaitingTime)    / processCounter;
+                if (SecondWindow::instance) {
+                    QMetaObject::invokeMethod(
+                        SecondWindow::instance,
+                        "onStatsUpdated",
+                        Qt::QueuedConnection,
+                        Q_ARG(double, avgT),
+                        Q_ARG(double, avgW)
+                        );
+                }
 
 
                 //for test

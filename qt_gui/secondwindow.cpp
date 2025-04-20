@@ -48,7 +48,7 @@ void SecondWindow::startSimulation(const QString &algorithm){
     scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
 
-    if (algorithm == "Priority Preemptive" || algorithm == "Priority Nonpreemptive") {
+    if (algorithm == "Priority Preemptive" || algorithm == "Priority Non-Preemptive") {
         ui->Process_Priority->setVisible(true);
         ui->label_Priority->setVisible(true);
     } else {
@@ -84,7 +84,7 @@ void SecondWindow::runAlgorithm(const QString &algorithmName)
     if (algorithmName == "FCFS") {
         FCFS();
     }
-    else if (algorithmName == "SJF Nonpreemptive") {
+    else if (algorithmName == "SJF Non-Preemptive") {
         SJF_NonPreemptive();
     }
     else if (algorithmName == "SJF Preemptive") {
@@ -93,7 +93,7 @@ void SecondWindow::runAlgorithm(const QString &algorithmName)
     else if (algorithmName == "Priority Preemptive") {
         priority_preemptive();
     }
-    else if (algorithmName == "Priority Nonpreemptive") {
+    else if (algorithmName == "Priority Non-Preemptive") {
         Priority_NonPreemptive();
     }
     else if (algorithmName == "Round Robin") {

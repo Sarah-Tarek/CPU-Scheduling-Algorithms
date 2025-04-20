@@ -88,8 +88,8 @@ void roundRobin() {
                             SecondWindow::instance,
                             "onStatsUpdated",
                             Qt::QueuedConnection,
-                            Q_ARG(double, avgW),
-                            Q_ARG(double, avgT)
+                            Q_ARG(double, avgT),
+                            Q_ARG(double, avgW)
                             );
                     }
 
