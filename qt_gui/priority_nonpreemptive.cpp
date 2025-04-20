@@ -4,6 +4,9 @@
 #include <vector>
 #include <thread>
 #include <chrono>
+#include <QMetaObject>
+#include "secondwindow.h"
+
 using namespace std;
 
 void Priority_NonPreemptive()
@@ -63,6 +66,19 @@ void Priority_NonPreemptive()
             current.waitingTime    = current.turnaroundTime - current.burstTime;
             totalTurnaroundTime   += current.turnaroundTime;
             totalWaitingTime      += current.waitingTime;
+
+            double avgT = double(totalTurnaroundTime) / processCounter;
+            double avgW = double(totalWaitingTime)    / processCounter;
+            if (SecondWindow::instance) {
+                QMetaObject::invokeMethod(
+                    SecondWindow::instance,
+                    "onStatsUpdated",
+                    Qt::QueuedConnection,
+                    Q_ARG(double, avgT),
+                    Q_ARG(double, avgW)
+                    );
+            }
+
         }
         else {
 

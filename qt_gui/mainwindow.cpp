@@ -112,7 +112,7 @@ void MainWindow::on_addProcessButton_clicked()
     //ui->processTable->setItem(row, 3, new QTableWidgetItem(QString::number(priority)));
    // ui->processTable->setItem(row, 4, new QTableWidgetItem(QString::number(quantum)));
 
-    if (algorithm == "Priority Preemptive" || algorithm == "Priority Nonpreemptive") {
+    if (algorithm == "Priority Preemptive" || algorithm == "Priority Non-Preemptive") {
         ui->processTable->setItem(row, 3, new QTableWidgetItem(QString::number(priority)));
     }
     else if (algorithm == "Round Robin") {
@@ -158,7 +158,7 @@ void MainWindow::on_deleteProcessButton_clicked()
 void MainWindow::on_algorithmComboBox_currentTextChanged(const QString &text)
 {
     // Show/hide input fields based on selected algorithm
-    bool isPriority = (text == "Priority Preemptive" || text == "Priority Nonpreemptive");
+    bool isPriority = (text == "Priority Preemptive" || text == "Priority Non-Preemptive");
     bool isRR = (text == "Round Robin");
 
     ui->PriorityLineEdit->setVisible(isPriority);
