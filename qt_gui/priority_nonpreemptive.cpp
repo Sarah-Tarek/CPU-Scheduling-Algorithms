@@ -34,7 +34,11 @@ void Priority_NonPreemptive()
         if (!pq.empty()) {
             Process current = pq.top();
             pq.pop();
-            processCounter++;
+            {
+                lock_guard<std::mutex> lock(mtx_processCounter);
+                processCounter++;
+            }
+
 
             // 4) “Run” it to completion, one tick at a time
             while (current.remainingTime > 0) {

@@ -67,13 +67,22 @@ void roundRobin() {
                 }
 
                 if (currentProcess.remainingTime == 0) {
-                    //processCounter++;
-                    //cout << "\nProcess Counter: " << processCounter << "\n\n";
-
+                    {
+                        lock_guard<std::mutex> lock(mtx_processCounter);
+                        processCounter++;
+                    }
+            
                     // Process finished: update finish time and compute statistics.
                     currentProcess.finishTime = currentTime;
+
+                    // Calculate turnaround time: finish - arrival
                     currentProcess.turnaroundTime = currentProcess.finishTime - currentProcess.arrivalTime;
+                    totalTurnaroundTime += currentProcess.turnaroundTime;
+
+                    // Calculate waiting time: turnaround - burst
                     currentProcess.waitingTime = currentProcess.turnaroundTime - currentProcess.burstTime;
+                    totalWaitingTime += currentProcess.waitingTime;
+
                 }
                 else {
                     // Process did not finish:

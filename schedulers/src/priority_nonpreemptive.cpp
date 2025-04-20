@@ -11,13 +11,13 @@ using namespace std;
 void Priority_NonPreemptive() {
 
     priority_queue<Process, vector<Process>, ComparePriority> pq;
-  
+
     while (true ) {
 
         {
             lock_guard<mutex> lock1(mtx_readyQueue);
             lock_guard<mutex> lock2(mtx_jobQueue);
-    
+
             // Exit only when all queues are empty (no jobs to arrive or run)
             if (readyQueue.empty() && jobQueue.empty() && pq.empty())
                 break;
@@ -45,8 +45,11 @@ void Priority_NonPreemptive() {
 
      current = pq.top();
      pq.pop();
-     processCounter++;
-     
+     {
+        lock_guard<std::mutex> lock(mtx_processCounter);
+        processCounter++;
+    }
+
      while (current.remainingTime != 0)
      {
          current.remainingTime --;
@@ -61,7 +64,7 @@ void Priority_NonPreemptive() {
              table[currentTime] = current;
          }
 
-         //this_thread::sleep_for(std::chrono::milliseconds(100)); 
+         //this_thread::sleep_for(std::chrono::milliseconds(100));
 
          if(current.remainingTime == 0){
              current.finishTime = currentTime ;
@@ -71,9 +74,9 @@ void Priority_NonPreemptive() {
              totalWaitingTime += current.waitingTime;
              cout<<"PID: "<<current.id<<"\n"<<"turnaround: "<<current.turnaroundTime<<"\n"<<"waiting: "<<current.waitingTime<<"\n";
             }
-         
-         
-        }  
+
+
+        }
        }
 
  else {
@@ -88,19 +91,19 @@ void Priority_NonPreemptive() {
           // Record the process that is running at this time in the global table
           table[currentTime] = current;
         }
-         
+
        }
  }
- 
+
 }
-    
-    
+
+
 
 
 /*//test
 int main() {
-    
-    Process p1("p1",0,2); //id arrival burst 
+
+    Process p1("p1",0,2); //id arrival burst
     p1.priority = 3;
     Process p2("p2",0,1);
     p2.priority = 1;
@@ -117,7 +120,7 @@ int main() {
     readyQueue.push(p4);
     readyQueue.push(p5);
 
-    Priority_NonPreemptive();  
+    Priority_NonPreemptive();
 
     cout<<"total turn: "<<totalTurnaroundTime<<"\n"<<"total wait: "<<totalWaitingTime<<"\n";
     return 0;

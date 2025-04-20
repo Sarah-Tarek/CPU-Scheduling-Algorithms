@@ -18,6 +18,7 @@ class SecondWindow : public QDialog
     Q_OBJECT
 
 public:
+    static SecondWindow *instance;
     explicit SecondWindow(QWidget *parent = nullptr);
     //void runAlgorithm(const QString &algorithmName);
     void setProcesses(const QVector<Process>& p );
@@ -26,6 +27,13 @@ public:
     ~SecondWindow();
 
 
+
+signals:
+    /// emitted any time the averages change
+    void statsUpdated(double avgWaiting, double avgTurnaround);
+
+private slots:
+    void onStatsUpdated(double avgWaiting, double avgTurnaround);
 
 private:
     Ui::SecondWindow *ui;

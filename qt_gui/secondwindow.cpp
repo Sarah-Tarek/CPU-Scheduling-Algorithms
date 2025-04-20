@@ -16,10 +16,14 @@
 #include <QString>
 #include <QScrollBar>
 
+SecondWindow* SecondWindow::instance = nullptr;
+
 SecondWindow::SecondWindow(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::SecondWindow)
 {
+    instance = this;
+
     ui->setupUi(this);
 
     this->setSizeGripEnabled(true); // allows resizing
@@ -33,6 +37,7 @@ SecondWindow::SecondWindow(QWidget *parent)
 
 SecondWindow::~SecondWindow()
 {
+    instance = nullptr;
     delete ui;
 }
 void SecondWindow::startSimulation(const QString &algorithm){
@@ -304,10 +309,6 @@ void SecondWindow::updateGanttChart()
     }
 }
 
-
-
-
-
 QColor SecondWindow::getColorForProcess(const QString& processName)
 {
     if (!processColors.contains(processName)) {
@@ -316,3 +317,9 @@ QColor SecondWindow::getColorForProcess(const QString& processName)
     }
     return processColors[processName];
 }
+
+void SecondWindow::onStatsUpdated(double avgWaiting, double avgTurnaround) {
+    ui->labelWaiting   ->setText(QString::number(avgWaiting,   'f', 2));
+    ui->labelTurnaround->setText(QString::number(avgTurnaround,'f', 2));
+}
+

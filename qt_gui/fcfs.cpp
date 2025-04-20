@@ -3,6 +3,9 @@
 #include "process.h"
 #include "global_variables.h"
 #include"fcfs.h"
+#include <QMetaObject>
+#include "secondwindow.h"
+
 using namespace std;
 
 
@@ -50,6 +53,11 @@ void FCFS() { //max_time for test change for void in the main function//void FCF
             else {
 
                 // Process has completed execution
+                {
+                    lock_guard<std::mutex> lock(mtx_processCounter);
+                    processCounter++;
+                }
+
 
                 // Set finish time to current time + 1 since we executed one unit
                 currentProcess.finishTime = currentTime + 1;
@@ -62,8 +70,17 @@ void FCFS() { //max_time for test change for void in the main function//void FCF
                 currentProcess.waitingTime = currentProcess.turnaroundTime - currentProcess.burstTime;
                 totalWaitingTime += currentProcess.waitingTime;
 
-
-
+                double avgT = double(totalTurnaroundTime) / processCounter;
+                double avgW = double(totalWaitingTime)    / processCounter;
+                if (SecondWindow::instance) {
+                    QMetaObject::invokeMethod(
+                        SecondWindow::instance,
+                        "onStatsUpdated",
+                        Qt::QueuedConnection,
+                        Q_ARG(double, avgT),
+                        Q_ARG(double, avgW)
+                        );
+                }
             }
 
             // Record the process running at this time

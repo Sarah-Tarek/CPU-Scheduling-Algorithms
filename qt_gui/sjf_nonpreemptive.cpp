@@ -38,7 +38,10 @@ void SJF_NonPreemptive() {
 
             current = pq.top();
             pq.pop();
-            processCounter++;
+            {
+                lock_guard<std::mutex> lock(mtx_processCounter);
+                processCounter++;
+            }
 
             while (current.remainingTime != 0)
             {
