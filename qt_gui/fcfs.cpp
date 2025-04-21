@@ -33,6 +33,13 @@ void FCFS() { //max_time for test change for void in the main function//void FCF
     while (true) {//while (currentTime < max_time)
         unique_lock<mutex> lock(mtx_readyQueue);
         cv_readyQueue.wait_for(lock, chrono::seconds(1));
+        {
+            std::lock_guard<std::mutex> lock1(mtx_jobQueue);
+            if(nonLiveFlag && jobQueue.empty() && readyQueue.empty() && arrivalQueue.empty()) {
+                finishFlag = true;
+                return;
+            }
+        }
         while (!readyQueue.empty()) {
             arrivalQueue.push(readyQueue.front());
             readyQueue.pop();
