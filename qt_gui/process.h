@@ -52,11 +52,7 @@ struct CompareProcessPriority {
         if (a.priority != b.priority)
             return a.priority > b.priority;
 
-        // If priority is the same, choose the one with shorter remaining time (Shortest Job First)
-        if (a.remainingTime != b.remainingTime)
-            return a.remainingTime > b.remainingTime;
-
-        // If burst time is also equal, choose the one that arrived earlier
+        // If priority is the same, choose the one that arrived earlier (FCFS)
         if (a.arrivalTime != b.arrivalTime)
             return a.arrivalTime > b.arrivalTime;
 
