@@ -1,4 +1,3 @@
-#include "secondwindow.h"
 #include "ui_secondwindow.h"
 #include "fcfs.h"
 #include "sjf_nonpreemptive.h"
@@ -181,6 +180,11 @@ void SecondWindow::onAddProcessClicked()
     ui->liveTable->setItem(row, 1, new QTableWidgetItem(QString::number(newprocess.arrivalTime)));
     ui->liveTable->setItem(row, 2, new QTableWidgetItem(QString::number(newprocess.burstTime)));
 
+
+    ui->Process_Burst->clear();
+    ui->Process_ID->clear();
+    ui->Process_Priority->clear();
+
 }
 
 void SecondWindow::setupLiveTable()
@@ -188,6 +192,10 @@ void SecondWindow::setupLiveTable()
     ui->liveTable->setColumnCount(3);
     ui->liveTable->setHorizontalHeaderLabels({"PID","Arrival Time", "Remaining Time"});
     ui->liveTable->horizontalHeader()->setStretchLastSection(true);
+
+
+
+
 }
 
 void SecondWindow::fillTable()
