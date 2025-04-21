@@ -51,17 +51,29 @@ void SecondWindow::startSimulation(const QString &algorithm){
     setupLiveTable();
 
     fillTable();
+    if(nonLiveFlag){
+
+        ui->Process_Priority->setVisible(false);
+        ui->addProcessButton->setVisible(false);
+        ui->Process_ID->setVisible(false);
+        ui->Process_Burst->setVisible(false);
+
+        ui->label_Burst->setVisible(false);
+        ui->label_ID->setVisible(false);
+        ui->label_Priority->setVisible(false);
+
+    }
 
     scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
-
-    if (algorithm == "Priority Preemptive" || algorithm == "Priority Non-Preemptive") {
-        ui->Process_Priority->setVisible(true);
-        ui->label_Priority->setVisible(true);
-    } else {
-        ui->Process_Priority->setVisible(false);
-        ui->label_Priority->setVisible(false);
-    }
+    if(!nonLiveFlag){
+        if (algorithm == "Priority Preemptive" || algorithm == "Priority Non-Preemptive") {
+            ui->Process_Priority->setVisible(true);
+            ui->label_Priority->setVisible(true);
+        } else {
+            ui->Process_Priority->setVisible(false);
+            ui->label_Priority->setVisible(false);
+        }}
 
     //stopThreads = false;
 
@@ -74,7 +86,7 @@ void SecondWindow::startSimulation(const QString &algorithm){
     schedulerThread = std::thread([this, algorithm]() {
         runAlgorithm(algorithm);
     });
-/*
+    /*
     liveTableThread = std::thread([this]() {
         liveTableChart();
     });
@@ -158,7 +170,7 @@ void SecondWindow::onAddProcessClicked()
         // Add the new process to the readyQueue
         readyQueue.push(newprocess);
     }
-     cv_readyQueue.notify_one();
+    cv_readyQueue.notify_one();
 
     // now update the table
     int row = ui->liveTable->rowCount();
@@ -316,7 +328,7 @@ void SecondWindow::updateGanttChart()
         totalChartWidth = chartX * blockWidth;
 
         // Automatically scroll the chart to the right if the total width exceeds the view width
-       if (totalChartWidth > ui->graphicsView->width()) {
+        if (totalChartWidth > ui->graphicsView->width()) {
             // Scroll the view horizontally to the right
             int shiftAmount = totalChartWidth - ui->graphicsView->width();
             ui->graphicsView->horizontalScrollBar()->setValue(shiftAmount);
@@ -372,10 +384,10 @@ void SecondWindow::on_resetButton_clicked()
         timer = nullptr;
     }
 
-   // stopThreads = true;
+    // stopThreads = true;
 
-   // if (readyQueueThread.joinable()) readyQueueThread.join();
-   // if (schedulerThread.joinable()) schedulerThread.join();
+    // if (readyQueueThread.joinable()) readyQueueThread.join();
+    // if (schedulerThread.joinable()) schedulerThread.join();
 
 
 
