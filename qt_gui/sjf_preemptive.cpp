@@ -48,6 +48,15 @@ void Sjf_Preemptive_Schedular() {
             // Wait for a signal from the condition variable (cv_readyQueue) before continuing
             // to ensure that the ready queue has processes available
             cv_readyQueue.wait_for(lock, std::chrono::seconds(1));
+
+            {
+                std::lock_guard<std::mutex> lock1(mtx_jobQueue);
+                if(nonLiveFlag && jobQueue.empty() && readyQueue.empty() &&processes.empty()) {
+                    finishFlag = true;
+                    return;
+                }
+            }
+
             while (!readyQueue.empty()) {
                 processes.push_back(readyQueue.front()); // Add the process to the vector
                 readyQueue.pop(); // Remove it from the queue
