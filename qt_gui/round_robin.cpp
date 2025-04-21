@@ -19,6 +19,13 @@ void roundRobin() {
             unique_lock<mutex> lock(mtx_readyQueue);
             // Wait briefly for new processes to arrive.
             cv_readyQueue.wait_for(lock, chrono::seconds(1));
+            {
+                std::lock_guard<std::mutex> lock1(mtx_jobQueue);
+                if(nonLiveFlag && jobQueue.empty() && readyQueue.empty() && localQueue.empty()) {
+                    finishFlag = true;
+                    return;
+                }
+            }
             while (!readyQueue.empty()) {
                 localQueue.push(readyQueue.front());
                 readyQueue.pop();
