@@ -63,7 +63,11 @@ struct CompareProcessPriority {
 
 struct CompareArrivalTime {
     bool operator()(const Process& a, const Process& b) {
-        return a.arrivalTime > b.arrivalTime;
+        if (a.arrivalTime != b.arrivalTime)
+            return a.arrivalTime > b.arrivalTime;
+
+        // If arrival time is equal, choose the one with lexicographically smaller ID(e.g., "P1" before "P2")
+        return a.id > b.id;
     }
 };
 
