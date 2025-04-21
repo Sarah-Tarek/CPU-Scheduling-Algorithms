@@ -39,5 +39,20 @@ int processCounter = 0;
 
 mutex mtx_processCounter;
 
+
 bool nonLiveFlag = false;
 bool finishFlag = false;
+
+void resetGlobalState() {
+    currentTime = 0;
+    totalTurnaroundTime = 0;
+    totalWaitingTime = 0;
+    processCounter = 0;
+
+    while (!readyQueue.empty()) readyQueue.pop();
+    while (!jobQueue.empty()) jobQueue.pop();
+    table.clear();
+}
+
+//std::atomic<bool> stopThreads = false;
+

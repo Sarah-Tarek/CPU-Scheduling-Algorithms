@@ -8,93 +8,80 @@
 using namespace std;
 
 
-void Priority_NonPreemptive() {
+void Priority_NonPreemptive()
+{
+    // min‑heap ordered by priority (lowest value = highest priority)
+    std::priority_queue<Process, std::vector<Process>, ComparePriority> pq;
 
-    priority_queue<Process, vector<Process>, ComparePriority> pq;
+    while (true) {
 
-    while (true ) {
 
         {
-            lock_guard<mutex> lock1(mtx_readyQueue);
-            lock_guard<mutex> lock2(mtx_jobQueue);
-
-            // Exit only when all queues are empty (no jobs to arrive or run)
-            if (readyQueue.empty() && jobQueue.empty() && pq.empty())
-                break;
+            std::unique_lock<std::mutex> lock(mtx_readyQueue);
+            cv_readyQueue.wait_for(lock, std::chrono::seconds(1));
+            while (!readyQueue.empty()) {
+                pq.push(readyQueue.front());
+                readyQueue.pop();
+            }
         }
 
-       // Transfer all processes from readyQueue into the priority queue
-       {
-        // Lock the readyQueue mutex to safely access the readyQueue
-        unique_lock<mutex> lock(mtx_readyQueue);
 
-        // Wait for a signal from the condition variable (cv_readyQueue) before continuing
-        // to ensure that the ready queue has processes available
-        cv_readyQueue.wait_for(lock, std::chrono::seconds(1));
-
-        // Transfer all processes from the readyQueue to the priority queue
-        while (!readyQueue.empty()) {
-            pq.push(readyQueue.front());
-            readyQueue.pop();
-        }
-    }
-
-    Process current;
-
-    if(!pq.empty()){
-
-     current = pq.top();
-     pq.pop();
-     {
-        lock_guard<std::mutex> lock(mtx_processCounter);
-        processCounter++;
-    }
-
-     while (current.remainingTime != 0)
-     {
-         current.remainingTime --;
-         {
-             lock_guard<mutex> lock2(mtx_currentTime);
-             currentTime++;
-         }
-
-         {
-             lock_guard<mutex> lock(mtx_table);
-             // Record the process that is running at this time in the global table
-             table[currentTime] = current;
-         }
-
-         //this_thread::sleep_for(std::chrono::milliseconds(100));
-
-         if(current.remainingTime == 0){
-             current.finishTime = currentTime ;
-             current.turnaroundTime = current.finishTime - current.arrivalTime;
-             totalTurnaroundTime += current.turnaroundTime;
-             current.waitingTime = current.turnaroundTime - current.burstTime;
-             totalWaitingTime += current.waitingTime;
-             cout<<"PID: "<<current.id<<"\n"<<"turnaround: "<<current.turnaroundTime<<"\n"<<"waiting: "<<current.waitingTime<<"\n";
+        if (!pq.empty()) {
+            Process current = pq.top();
+            pq.pop();
+            {
+                lock_guard<std::mutex> lock(mtx_processCounter);
+                processCounter++;
             }
 
 
-        }
-       }
 
- else {
-        current = Process();  //idle
-        {
-         lock_guard<mutex> lock2(mtx_currentTime);
-         currentTime++;
-        }
-        // Lock the table mutex to safely access the shared table where we record running processes
-       {
-          lock_guard<mutex> lock(mtx_table);
-          // Record the process that is running at this time in the global table
-          table[currentTime] = current;
-        }
+            while (current.remainingTime > 0) {
+                current.remainingTime--;
 
-       }
- }
+                {
+                    lock_guard<mutex> lock(mtx_table);
+                    table[currentTime] = current;
+                }
+                {
+                    lock_guard<mutex> lock2(mtx_currentTime);
+                    currentTime++;
+                }
 
+                // give GUI & other threads breathing room
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+
+           
+            current.finishTime     = currentTime;
+            current.turnaroundTime = current.finishTime - current.arrivalTime;
+            current.waitingTime    = current.turnaroundTime - current.burstTime;
+            totalTurnaroundTime   += current.turnaroundTime;
+            totalWaitingTime      += current.waitingTime;
+
+            double avgT = double(totalTurnaroundTime) / processCounter;
+            double avgW = double(totalWaitingTime)    / processCounter;
+            
+
+        }
+        else {
+
+            // CPU is idle
+            //Process idleProcess;
+
+            {
+                std::lock_guard<std::mutex> tableLock(mtx_table);
+                table[currentTime] = Process();  // idle marker
+            }
+
+            {
+                std::lock_guard<std::mutex> timeLock(mtx_currentTime);
+                currentTime++;
+            }
+
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+    }
 }
 
 

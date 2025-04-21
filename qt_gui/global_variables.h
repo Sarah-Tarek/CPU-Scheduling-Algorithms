@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include<mutex>
 #include <condition_variable>
+#include <atomic>
 
 struct CompareArrival {
     bool operator()(const Process& a, const Process& b) {
@@ -48,6 +49,15 @@ extern condition_variable cv_readyQueue;
 
 extern int processCounter ;
 extern mutex mtx_processCounter;
+
 extern bool nonLiveFlag;
 extern bool finishFlag;
+
+
+void resetGlobalState();
+
+
+//extern std::atomic<bool> stopThreads;
+
+
 #endif

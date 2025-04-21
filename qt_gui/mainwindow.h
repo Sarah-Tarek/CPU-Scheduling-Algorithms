@@ -18,6 +18,9 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
+
+    void resetProcessTable();
+
     ~MainWindow();
 
 
@@ -36,7 +39,8 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    SecondWindow *secondWindow;
+    SecondWindow *secondWindow = nullptr;
+    //SecondWindow *secondWindow;
     QVector<Process> processes;
     QString algorithm;
     int priority;
@@ -44,6 +48,8 @@ private:
     int row;
     int storedQuantum = -1;
 
+
     void show_second_window();
+
 };
 #endif // MAINWINDOW_H

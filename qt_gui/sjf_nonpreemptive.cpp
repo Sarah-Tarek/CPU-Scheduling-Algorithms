@@ -11,7 +11,7 @@ using namespace std;
 
 
 
-void SJF_NonPreemptive() {
+/*void SJF_NonPreemptive() {
 
     priority_queue<Process, vector<Process>, CompareBurst> pq;
 
@@ -35,11 +35,11 @@ void SJF_NonPreemptive() {
         }
 
 
-        Process current;
+
 
         if(!pq.empty()){
 
-            current = pq.top();
+            Process current = pq.top();
             pq.pop();
             {
                 lock_guard<std::mutex> lock(mtx_processCounter);
@@ -85,10 +85,10 @@ void SJF_NonPreemptive() {
         }
 
         else {
-            current = Process();  //idle
+            Process idle = Process();  //idle
             {
                 lock_guard<mutex> lock(mtx_table);
-                table[currentTime] = current;
+                table[currentTime] = idle;
             }
             {
                 lock_guard<mutex> lock2(mtx_currentTime);
@@ -98,6 +98,85 @@ void SJF_NonPreemptive() {
         }
     }
 
+}*/
+
+void SJF_NonPreemptive() {
+
+    priority_queue<Process, vector<Process>, CompareBurst> pq;
+
+    while (true) {
+        // Transfer all processes from readyQueue into the priority queue
+        {
+            unique_lock<mutex> lock(mtx_readyQueue);
+            cv_readyQueue.wait_for(lock, std::chrono::seconds(1));
+
+            while (!readyQueue.empty()) {
+                pq.push(readyQueue.front());
+                readyQueue.pop();
+            }
+        }
+
+        if (!pq.empty()) {
+            Process current = pq.top();
+            pq.pop();
+            {
+                lock_guard<std::mutex> lock(mtx_processCounter);
+                processCounter++;
+            }
+
+            while (current.remainingTime > 0) {
+                current.remainingTime--;
+
+                {
+                    lock_guard<mutex> lock(mtx_table);
+                    table[currentTime] = current;
+                }
+                {
+                    lock_guard<mutex> lock2(mtx_currentTime);
+                    currentTime++;
+                }
+
+                // Optional: Simulate time tick
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+
+            // Process completed
+
+            current.finishTime = currentTime;
+            current.turnaroundTime = current.finishTime - current.arrivalTime;
+            totalTurnaroundTime += current.turnaroundTime;
+
+            current.waitingTime = current.turnaroundTime - current.burstTime;
+            totalWaitingTime += current.waitingTime;
+
+            double avgT = double(totalTurnaroundTime) / processCounter;
+            double avgW = double(totalWaitingTime)    / processCounter;
+            if (SecondWindow::instance) {
+                QMetaObject::invokeMethod(
+                    SecondWindow::instance,
+                    "onStatsUpdated",
+                    Qt::QueuedConnection,
+                    Q_ARG(double, avgT),
+                    Q_ARG(double, avgW)
+                    );
+            }
+
+
+        } else {
+            // CPU is idle
+            Process idleProcess;
+            {
+                lock_guard<mutex> lock(mtx_table);
+                table[currentTime] = idleProcess;
+            }
+            {
+                lock_guard<mutex> lock2(mtx_currentTime);
+                currentTime++;
+            }
+
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+    }
 }
 
 /*// Function to continuously print the live table of process execution

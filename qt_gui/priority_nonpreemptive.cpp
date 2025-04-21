@@ -15,15 +15,8 @@ void Priority_NonPreemptive()
     std::priority_queue<Process, std::vector<Process>, ComparePriority> pq;
 
     while (true) {
-        // 1) Exit if there's nothing left to arrive or run
-       /* {
-            std::lock_guard<std::mutex> readyLock(mtx_readyQueue);
-            std::lock_guard<std::mutex> jobLock(mtx_jobQueue);
-            if (readyQueue.empty() && jobQueue.empty() && pq.empty())
-                break;
-        }*/
 
-        // 2) Drain newly‐ready jobs into local pq
+
         {
             std::unique_lock<std::mutex> lock(mtx_readyQueue);
             cv_readyQueue.wait_for(lock, std::chrono::seconds(1));
@@ -33,7 +26,7 @@ void Priority_NonPreemptive()
             }
         }
 
-        // 3) Pick the highest‑priority process (lowest priority value)
+
         if (!pq.empty()) {
             Process current = pq.top();
             pq.pop();
@@ -43,7 +36,7 @@ void Priority_NonPreemptive()
             }
 
 
-            // 4) “Run” it to completion, one tick at a time
+
             while (current.remainingTime > 0) {
                 current.remainingTime--;
 
@@ -82,13 +75,14 @@ void Priority_NonPreemptive()
         }
         else {
 
+            // CPU is idle
+            //Process idleProcess;
 
             {
                 std::lock_guard<std::mutex> tableLock(mtx_table);
                 table[currentTime] = Process();  // idle marker
             }
-            // 6) Idle tick if nothing ready
-            // 6) Idle tick if nothing ready
+
             {
                 std::lock_guard<std::mutex> timeLock(mtx_currentTime);
                 currentTime++;

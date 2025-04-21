@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include "global_variables.h"
 
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -29,15 +30,26 @@ MainWindow::~MainWindow()
 }
 
 
+
 void MainWindow::show_second_window(){
-    secondWindow = new SecondWindow(this);
-    secondWindow->show();
+
 
 
     if (processes.isEmpty()) {
         QMessageBox::warning(this, "No Processes", "Please add at least one process.");
         return;
     }
+
+    resetGlobalState();
+
+
+    if (secondWindow) {
+        secondWindow->close();
+        secondWindow = nullptr;
+    }
+
+    secondWindow = new SecondWindow(this);
+    secondWindow->show();
 
     secondWindow->setProcesses(processes);
 
@@ -47,12 +59,13 @@ void MainWindow::show_second_window(){
     this->hide();//hide main window
 }
 
-
 void MainWindow::on_pushButton_start_clicked()
 {
     show_second_window();
 
 }
+
+
 
 
 
@@ -180,10 +193,14 @@ void MainWindow::on_algorithmComboBox_currentTextChanged(const QString &text)
         //ui->processTable->setItem(row, 3, new QTableWidgetItem(QString::number(quantum)));
     }
 
-
-
-
 }
+
+void MainWindow::resetProcessTable() {
+    ui->processTable->setRowCount(0);  // Clear all rows
+    processes.clear();                 // Clear your internal list
+    ui->algorithmComboBox->setEnabled(true); // Re-enable selection
+}
+
 
 
 
@@ -194,4 +211,5 @@ void MainWindow::on_nonLiveButton_clicked()
     nonLiveFlag = true;
     show_second_window();
 }
+
 

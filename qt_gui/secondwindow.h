@@ -24,6 +24,7 @@ public:
     void setProcesses(const QVector<Process>& p );
     void updateGanttChart();
     void startSimulation(const QString &algorithm);
+
     ~SecondWindow();
 
 
@@ -34,6 +35,12 @@ signals:
 
 private slots:
     void onStatsUpdated(double avgWaiting, double avgTurnaround);
+
+    void on_finishButton_clicked();
+
+
+
+    void on_resetButton_clicked();
 
 private:
     Ui::SecondWindow *ui;
@@ -49,6 +56,8 @@ private:
     QColor getColorForProcess(const QString &name);
 
     std::thread readyQueueThread;
+
+
 
     std::thread liveTableThread;
     std::thread schedulerThread;

@@ -15,6 +15,7 @@
 #include <QBrush>
 #include <QString>
 #include <QScrollBar>
+#include "mainwindow.h"
 
 SecondWindow* SecondWindow::instance = nullptr;
 
@@ -33,12 +34,18 @@ SecondWindow::SecondWindow(QWidget *parent)
     if (parent)
         this->resize(parent->size());
     connect(ui->addProcessButton, &QPushButton::clicked, this, &SecondWindow::onAddProcessClicked);
+
+
+
 }
 
 SecondWindow::~SecondWindow()
 {
     instance = nullptr;
     delete ui;
+
+
+
 }
 void SecondWindow::startSimulation(const QString &algorithm){
     setupLiveTable();
@@ -55,6 +62,8 @@ void SecondWindow::startSimulation(const QString &algorithm){
         ui->Process_Priority->setVisible(false);
         ui->label_Priority->setVisible(false);
     }
+
+    //stopThreads = false;
 
     readyQueueThread = std::thread([]() {
         addToReadyQueue();
@@ -334,5 +343,52 @@ QColor SecondWindow::getColorForProcess(const QString& processName)
 void SecondWindow::onStatsUpdated(double avgWaiting, double avgTurnaround) {
     ui->labelWaiting   ->setText(QString::number(avgWaiting,   'f', 2));
     ui->labelTurnaround->setText(QString::number(avgTurnaround,'f', 2));
+}
+
+
+void SecondWindow::on_finishButton_clicked()
+{
+    QApplication::quit();
+}
+
+
+
+
+
+void SecondWindow::on_resetButton_clicked()
+{
+
+
+    chartX = 0;
+    if (scene) {
+        scene->clear();
+    }
+    processColors.clear();
+    ui->liveTable->setRowCount(0);
+
+    if (timer) {
+        timer->stop();
+        delete timer;
+        timer = nullptr;
+    }
+
+   // stopThreads = true;
+
+   // if (readyQueueThread.joinable()) readyQueueThread.join();
+   // if (schedulerThread.joinable()) schedulerThread.join();
+
+    // Close second window
+    this->close();
+
+    MainWindow *mainWin = qobject_cast<MainWindow *>(parent());
+    if (mainWin) {
+        mainWin->resetProcessTable();
+        mainWin->show();
+    }
+
+    // Close second window
+    this->close();
+
+
 }
 
