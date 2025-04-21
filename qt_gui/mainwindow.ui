@@ -145,14 +145,14 @@
     <item>
      <widget class="QPushButton" name="pushButton_start">
       <property name="text">
-       <string>start</string>
+       <string>Live Mode</string>
       </property>
      </widget>
     </item>
     <item>
      <widget class="QPushButton" name="nonLiveButton">
       <property name="text">
-       <string>Non Live</string>
+       <string> Non Live Mode</string>
       </property>
      </widget>
     </item>
@@ -164,7 +164,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>17</height>
     </rect>
    </property>
   </widget>

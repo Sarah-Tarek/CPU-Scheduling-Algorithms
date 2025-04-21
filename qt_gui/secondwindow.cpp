@@ -377,8 +377,7 @@ void SecondWindow::on_resetButton_clicked()
    // if (readyQueueThread.joinable()) readyQueueThread.join();
    // if (schedulerThread.joinable()) schedulerThread.join();
 
-    // Close second window
-    this->close();
+
 
     MainWindow *mainWin = qobject_cast<MainWindow *>(parent());
     if (mainWin) {

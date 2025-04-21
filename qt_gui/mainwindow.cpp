@@ -66,9 +66,6 @@ void MainWindow::on_pushButton_start_clicked()
 }
 
 
-
-
-
 void MainWindow::on_addProcessButton_clicked()
 {
     QString id = ui->idLineEdit->text();
@@ -200,9 +197,6 @@ void MainWindow::resetProcessTable() {
     processes.clear();                 // Clear your internal list
     ui->algorithmComboBox->setEnabled(true); // Re-enable selection
 }
-
-
-
 
 
 
