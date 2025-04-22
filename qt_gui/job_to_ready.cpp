@@ -1,10 +1,16 @@
 #include "job_to_ready.h"
 #include "global_variables.h"
+#include<thread>
 
 // function to add processes to the ready queue when their arrival time matches the current time
 void addToReadyQueue() {
     // infinite loop to continuously check and add processes to the ready queue
     while (true) {
+
+        while (paused.load()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+
         if(nonLiveFlag && jobQueue.empty()){
             return;
         }

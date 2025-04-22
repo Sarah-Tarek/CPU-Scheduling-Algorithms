@@ -1,3 +1,4 @@
+#include "secondwindow.h"
 #include "ui_secondwindow.h"
 #include "fcfs.h"
 #include "sjf_nonpreemptive.h"
@@ -74,7 +75,6 @@ void SecondWindow::startSimulation(const QString &algorithm){
             ui->label_Priority->setVisible(false);
         }}
 
-    //stopThreads = false;
 
     readyQueueThread = std::thread([]() {
         addToReadyQueue();
@@ -86,12 +86,6 @@ void SecondWindow::startSimulation(const QString &algorithm){
         runAlgorithm(algorithm);
     });
 
-
-    /*
-    liveTableThread = std::thread([this]() {
-        liveTableChart();
-    });
-*/
 
     // Start thread : Gantt chart via Qt Timer
     timer = new QTimer(this);
@@ -374,39 +368,20 @@ void SecondWindow::on_finishButton_clicked()
 
 
 
-void SecondWindow::on_resetButton_clicked()
+void SecondWindow::on_pauseButton_clicked()
 {
-
-
-    chartX = 0;
-    if (scene) {
-        scene->clear();
+    paused.store(true);
+    if (timer && timer->isActive()) {
+        timer->stop();  // This pauses the chart updates
     }
-    processColors.clear();
-    ui->liveTable->setRowCount(0);
+}
 
-    if (timer) {
-        timer->stop();
-        delete timer;
-        timer = nullptr;
+
+void SecondWindow::on_resumeButton_clicked()
+{
+    paused.store(false);
+    if (timer && !timer->isActive()) {
+        timer->start(1000);  // Resume chart updates
     }
-
-    // stopThreads = true;
-
-    // if (readyQueueThread.joinable()) readyQueueThread.join();
-    // if (schedulerThread.joinable()) schedulerThread.join();
-
-
-
-    MainWindow *mainWin = qobject_cast<MainWindow *>(parent());
-    if (mainWin) {
-        mainWin->resetProcessTable();
-        mainWin->show();
-    }
-
-    // Close second window
-    this->close();
-
-
 }
 

@@ -16,10 +16,24 @@ void Priority_NonPreemptive()
 
     while (true) {
 
+        while (paused.load()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+
 
         {
             std::unique_lock<std::mutex> lock(mtx_readyQueue);
+
             cv_readyQueue.wait_for(lock, std::chrono::seconds(1));
+
+            {
+                std::lock_guard<std::mutex> lock1(mtx_jobQueue);
+                if(nonLiveFlag && jobQueue.empty() && readyQueue.empty() && pq.empty()) {
+                    finishFlag = true;
+                    return;
+                }
+            }
+
             while (!readyQueue.empty()) {
                 pq.push(readyQueue.front());
                 readyQueue.pop();

@@ -54,5 +54,5 @@ void resetGlobalState() {
     table.clear();
 }
 
-//std::atomic<bool> stopThreads = false;
+std::atomic<bool> paused(false);
 

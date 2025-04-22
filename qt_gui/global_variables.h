@@ -56,8 +56,7 @@ extern bool finishFlag;
 
 void resetGlobalState();
 
-
-//extern std::atomic<bool> stopThreads;
+extern std::atomic<bool> paused;
 
 
 #endif

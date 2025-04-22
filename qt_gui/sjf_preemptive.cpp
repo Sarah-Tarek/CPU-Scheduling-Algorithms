@@ -35,6 +35,11 @@ void Sjf_Preemptive_Schedular() {
     // Main simulation loop (runs indefinitely in this case)
 
     while (true) {
+
+        while (paused.load()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+
         // Dynamically allocate a new Process object and assign it to current_process
         current_process = new Process();
 

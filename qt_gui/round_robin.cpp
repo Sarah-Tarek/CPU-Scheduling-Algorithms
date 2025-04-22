@@ -13,6 +13,11 @@ using namespace std;
 
 void roundRobin() {
     while (true) {
+
+        while (paused.load()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+
         // Copy processes from the global readyQueue into a local queue
         queue<Process> localQueue;
         {

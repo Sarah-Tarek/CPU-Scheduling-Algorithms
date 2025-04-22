@@ -41,7 +41,9 @@ private slots:
 
 
 
-    void on_resetButton_clicked();
+    void on_pauseButton_clicked();
+
+    void on_resumeButton_clicked();
 
 private:
     Ui::SecondWindow *ui;

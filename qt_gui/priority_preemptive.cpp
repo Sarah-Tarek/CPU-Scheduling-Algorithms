@@ -7,6 +7,7 @@
 #include <chrono>
 #include <QMetaObject>
 #include "secondwindow.h"
+#include<thread>
 
 using namespace std;
 
@@ -35,6 +36,10 @@ void priority_preemptive() {
     //change to while(!q.empty()) to test
     // Main scheduling loop (infinite until manually stopped or a condition is added)
     while (true) {
+
+        while (paused.load()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
 
         // Transfer all processes from readyQueue into the priority queue
         {

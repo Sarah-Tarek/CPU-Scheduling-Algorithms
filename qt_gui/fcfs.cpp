@@ -5,6 +5,7 @@
 #include"fcfs.h"
 #include <QMetaObject>
 #include "secondwindow.h"
+#include<thread>
 
 using namespace std;
 
@@ -31,18 +32,35 @@ void FCFS() { //max_time for test change for void in the main function//void FCF
     priority_queue<Process, vector<Process>, CompareArrivalTime> arrivalQueue;
 
     while (true) {//while (currentTime < max_time)
-        unique_lock<mutex> lock(mtx_readyQueue);
-        cv_readyQueue.wait_for(lock, chrono::seconds(1));
-        {
-            std::lock_guard<std::mutex> lock1(mtx_jobQueue);
-            if(nonLiveFlag && jobQueue.empty() && readyQueue.empty() && arrivalQueue.empty()) {
-                finishFlag = true;
-                return;
-            }
+
+        while (paused.load()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-        while (!readyQueue.empty()) {
-            arrivalQueue.push(readyQueue.front());
-            readyQueue.pop();
+
+        // Transfer all processes from readyQueue into the priority queue
+        {
+
+            // Lock the readyQueue mutex to safely access the readyQueue
+            unique_lock<mutex> lock(mtx_readyQueue);
+
+            // Wait for a signal from the condition variable (cv_readyQueue) before continuing
+            // to ensure that the ready queue has processes available
+            cv_readyQueue.wait_for(lock, std::chrono::seconds(1));
+
+            {
+                std::lock_guard<std::mutex> lock1(mtx_jobQueue);
+                if(nonLiveFlag && jobQueue.empty() && readyQueue.empty() && arrivalQueue.empty()) {
+                    finishFlag = true;
+                    return;
+                }
+            }
+
+
+            // Transfer all processes from the readyQueue to the priority queue
+            while (!readyQueue.empty()) {
+                arrivalQueue.push(readyQueue.front());
+                readyQueue.pop();
+            }
         }
 
         if (!arrivalQueue.empty()) {
@@ -79,7 +97,6 @@ void FCFS() { //max_time for test change for void in the main function//void FCF
 
                 double avgT = double(totalTurnaroundTime) / processCounter;
                 double avgW = double(totalWaitingTime)    / processCounter;
-
                 if (SecondWindow::instance) {
                     QMetaObject::invokeMethod(
                         SecondWindow::instance,
@@ -89,6 +106,7 @@ void FCFS() { //max_time for test change for void in the main function//void FCF
                         Q_ARG(double, avgW)
                         );
                 }
+            }
 
             // Record the process running at this time
             unique_lock<mutex> lock(mtx_table);
