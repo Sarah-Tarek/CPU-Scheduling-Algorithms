@@ -1,4 +1,3 @@
-#include <iostream>
 #include <vector>
 #include "process.h"
 #include "global_variables.h"
@@ -8,23 +7,6 @@
 #include<thread>
 
 using namespace std;
-
-
-/*// Function to print the execution log of processes from the table (for test)
-void printTable(unordered_map<int, Process> table) {
-    for (const auto& entry : table) {
-        cout << "at time = " << entry.first
-            << ", the running process is " << entry.second.id
-            << " with priority = " << entry.second.priority << endl;
-    }
-}*/
-
-/*mutex mtx_readyQueue;
-mutex mtx_table;
-mutex mtx_jobQueue;
-mutex mtx_currentTime;
-
-condition_variable cv_readyQueue;*/
 
 void FCFS() { //max_time for test change for void in the main function//void FCFS(int max_time)
 
@@ -122,24 +104,3 @@ void FCFS() { //max_time for test change for void in the main function//void FCF
         currentTime++;
     }
 }
-
-
-//test
-
-/*int main () {
-        Process p1("p1",0,6);
-        Process p2("p2",2,4);
-        Process p3("p3",3,3);
-        Process p4("p4",1,1);
-
-        readyQueue.push(p1);
-        readyQueue.push(p2);
-        readyQueue.push(p3);
-        readyQueue.push(p4);
-        FCFS(15);  // simulate 15 time units
-
-        printTable(table); //  print the log
-
-        cout << "Total Turnaround Time: " << totalTurnaroundTime << "\n";
-        cout << "Total Waiting Time: " << totalWaitingTime << "\n";
-    }*/
