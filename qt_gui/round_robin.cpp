@@ -103,8 +103,6 @@ void roundRobin() {
                 }
                 else {
                     // Process did not finish:
-                    // Update its arrival time to the current global time (it becomes ready immediately).
-                    currentProcess.arrivalTime = currentTime;
                     // Reset its quantum to allowedQuantum.
                     currentProcess.quantum = allowedQuantum;
                     {

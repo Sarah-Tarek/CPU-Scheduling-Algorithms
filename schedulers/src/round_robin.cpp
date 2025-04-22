@@ -13,24 +13,29 @@
 
 using namespace std;
 
-void roundRobin() {
-    while (true) {
+void roundRobin()
+{
+    while (true)
+    {
         // Copy processes from the global readyQueue into a local queue
         queue<Process> localQueue;
         {
             unique_lock<mutex> lock(mtx_readyQueue);
             // Wait briefly for new processes to arrive.
             cv_readyQueue.wait_for(lock, chrono::seconds(1));
-            while (!readyQueue.empty()) {
+            while (!readyQueue.empty())
+            {
                 localQueue.push(readyQueue.front());
                 readyQueue.pop();
             }
         }
 
         // If we found any processes in the global readyQueue, process them.
-        if (!localQueue.empty()) {
+        if (!localQueue.empty())
+        {
             // Process the local queue
-            while (!localQueue.empty()) {
+            while (!localQueue.empty())
+            {
                 Process currentProcess = localQueue.front();
                 localQueue.pop();
 
@@ -40,10 +45,12 @@ void roundRobin() {
                 // Determine runtime: run for the full quantum if possible; else, run for the remaining time.
                 int runtime = (currentProcess.remainingTime >= allowedQuantum) ? allowedQuantum : currentProcess.remainingTime;
 
-                if (runtime == 0) runtime = 1;  // force progress
+                if (runtime == 0)
+                    runtime = 1; // force progress
 
                 // Execute the process for 'runtime' consecutive time units.
-                for (int i = 0; i < runtime; i++) {
+                for (int i = 0; i < runtime; i++)
+                {
                     currentProcess.remainingTime--;
 
                     {
@@ -59,19 +66,21 @@ void roundRobin() {
                     // Every tick, pull in any arrivals into localQueue
                     {
                         lock_guard<mutex> lock(mtx_readyQueue);
-                        while (!readyQueue.empty()) {
+                        while (!readyQueue.empty())
+                        {
                             localQueue.push(readyQueue.front());
                             readyQueue.pop();
                         }
                     }
                 }
 
-                if (currentProcess.remainingTime == 0) {
+                if (currentProcess.remainingTime == 0)
+                {
                     {
                         lock_guard<std::mutex> lock(mtx_processCounter);
                         processCounter++;
                     }
-            
+
                     // Process finished: update finish time and compute statistics.
                     currentProcess.finishTime = currentTime;
 
@@ -82,9 +91,9 @@ void roundRobin() {
                     // Calculate waiting time: turnaround - burst
                     currentProcess.waitingTime = currentProcess.turnaroundTime - currentProcess.burstTime;
                     totalWaitingTime += currentProcess.waitingTime;
-
                 }
-                else {
+                else
+                {
                     // Process did not finish:
                     // Update its arrival time to the current global time (it becomes ready immediately).
                     currentProcess.arrivalTime = currentTime;
@@ -98,11 +107,12 @@ void roundRobin() {
                 }
             } // End processing localQueue.
         }
-        else {
+        else
+        {
             // If no process is available in the global readyQueue, idle for one time unit.
             {
                 lock_guard<mutex> lock(mtx_currentTime);
-                Process idleProcess;  // default idle process
+                Process idleProcess; // default idle process
                 {
                     lock_guard<mutex> lockTable(mtx_table);
                     table[currentTime] = idleProcess;
@@ -149,19 +159,23 @@ void addToReadyQueue() {
  */
 
 // Function to continuously print the live table of process execution
-void printTableLive() {
+void printTableLive()
+{
     // Infinite loop to keep the table updated in real-time
-    while (true) {
+    while (true)
+    {
         // Lock the table mutex to ensure thread-safe access to the shared 'table'
         lock_guard<mutex> lock(mtx_table);
 
         // Check if the table contains any entries (if there's any process execution data to print)
-        if (table.size() != 0) {
+        if (table.size() != 0)
+        {
             // Loop through each entry in the table
-            for (const auto& entry : table) {
+            for (const auto &entry : table)
+            {
                 // Print the current time, running process ID, and its priority
                 cout << "at time = " << entry.first
-                    << ", the running process is " << entry.second.id << endl;
+                     << ", the running process is " << entry.second.id << endl;
 
                 // Sleep for 1 second between prints (to simulate live update every second)
                 this_thread::sleep_for(std::chrono::seconds(1));
@@ -173,13 +187,14 @@ void printTableLive() {
     }
 }
 
-int main() {
-    int allowedQuantum = 3;
+int main()
+{
+    int allowedQuantum = 1;
 
-    /* // Test 1:
-    Process p1("P1", 0, 3);  // t=0-2
-    Process p2("P2", 1, 4);  // t=3-5 t=8
-    Process p3("P3", 2, 2);  // t=6-7 */
+    // Test 1:
+    Process p1("P1", 0, 3); // t=0-2
+    Process p2("P2", 1, 4); // t=3-5 t=8
+    Process p3("P3", 2, 2); // t=6-7
 
     /* // Test 2:
     Process p1("P1", 0, 5);  // t=0-2 t=8-9
@@ -187,9 +202,9 @@ int main() {
     Process p3("P3", 0, 2);  // t=6-7 */
 
     // Test 3:
-    Process p1("P1", 0, 3);  // t=0-2
-    Process p2("P2", 1, 4);  // t=3-6
-    Process p3("P3", 8, 2);  // t=8-9
+    // Process p1("P1", 0, 3); // t=0-2
+    // Process p2("P2", 1, 4); // t=3-6
+    // Process p3("P3", 8, 2); // t=8-9
 
     /* // Test 4:
     Process p1("P1", 1, 2);  // t=3-4
