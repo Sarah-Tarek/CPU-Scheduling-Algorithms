@@ -145,9 +145,9 @@ void SecondWindow::onAddProcessClicked()
 
     int priority = -1;
 
-    // If priority is visible, read value
-    if (ui->Process_Burst->isVisible()) {
-        priority = ui->Process_Burst->text().toInt(&priorityOk);
+   // If priority is visible, read value
+    if (ui->Process_Priority->isVisible()) {
+        priority = ui->Process_Priority->text().toInt(&priorityOk);
         if (!priorityOk) {
             QMessageBox::warning(this, "Invalid Input", "Please enter a valid Priority value.");
             return;
