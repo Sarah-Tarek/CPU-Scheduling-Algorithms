@@ -1,109 +1,109 @@
-#include <vector>
+#include "fcfs.h"
 #include "process.h"
 #include "global_variables.h"
-#include"fcfs.h"
-#include <QMetaObject>
 #include "secondwindow.h"
-#include<thread>
+
+#include <queue>
+#include <vector>
+#include <thread>
+#include <mutex>
+#include <chrono>
+#include <condition_variable>
+#include <QMetaObject>
 
 using namespace std;
 
-void FCFS() { //max_time for test change for void in the main function//void FCFS(int max_time)
-
-    // Priority queue to manage ready processes based on their arrival_time
+void FCFS() {
+    // min‑heap of ready processes by arrivalTime,
+    // using the CompareArrivalTime from process.h
     priority_queue<Process, vector<Process>, CompareArrivalTime> arrivalQueue;
 
-    while (true) {//while (currentTime < max_time)
-
+    while (true) {
+        // 1) honor pause
         while (paused.load()) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            this_thread::sleep_for(chrono::milliseconds(100));
         }
 
-        // Transfer all processes from readyQueue into the priority queue
+        // 2) pull any newly ready processes into our heap
         {
+            unique_lock<mutex> lk_ready(mtx_readyQueue);
+            cv_readyQueue.wait_for(lk_ready, chrono::seconds(1));
 
-            // Lock the readyQueue mutex to safely access the readyQueue
-            unique_lock<mutex> lock(mtx_readyQueue);
-
-            // Wait for a signal from the condition variable (cv_readyQueue) before continuing
-            // to ensure that the ready queue has processes available
-            cv_readyQueue.wait_for(lock, std::chrono::seconds(1));
-
+            // shutdown?
+            lock_guard<mutex> lk_job(mtx_jobQueue);
+            if (nonLiveFlag
+                && jobQueue.empty()
+                && readyQueue.empty()
+                && arrivalQueue.empty())
             {
-                std::lock_guard<std::mutex> lock1(mtx_jobQueue);
-                if(nonLiveFlag && jobQueue.empty() && readyQueue.empty() && arrivalQueue.empty()) {
-                    finishFlag = true;
-                    return;
-                }
+                finishFlag = true;
+                return;
             }
 
-
-            // Transfer all processes from the readyQueue to the priority queue
             while (!readyQueue.empty()) {
                 arrivalQueue.push(readyQueue.front());
                 readyQueue.pop();
             }
         }
 
-        if (!arrivalQueue.empty()) {
-
-            Process currentProcess = arrivalQueue.top();
-            arrivalQueue.pop();
-
-            // Simulate execution for one time unit
-            currentProcess.remainingTime--;
-
-            // If the process is not finished yet, put it back in the queue
-            if (currentProcess.remainingTime != 0) {
-                arrivalQueue.push(currentProcess);
+        // 3) if nothing to run → idle one tick
+        if (arrivalQueue.empty()) {
+            {
+                lock_guard<mutex> lk_t(mtx_currentTime);
+                lock_guard<mutex> lk_tab(mtx_table);
+                table[currentTime] = Process();  // idle
+                ++currentTime;
             }
-            else {
+            this_thread::sleep_for(chrono::seconds(1));
+            continue;
+        }
 
-                // Process has completed execution
-                {
-                    lock_guard<std::mutex> lock(mtx_processCounter);
-                    processCounter++;
-                }
+        // 4) pop the next process
+        Process current = arrivalQueue.top();
+        arrivalQueue.pop();
 
+        // 5) simulate exactly one time unit
+        this_thread::sleep_for(chrono::seconds(1));
+        current.remainingTime--;
 
-                // Set finish time to current time + 1 since we executed one unit
-                currentProcess.finishTime = currentTime + 1;
+        // 6) record *after* the decrement so you capture that final tick
+        {
+            lock_guard<mutex> lk_t(mtx_currentTime);
+            lock_guard<mutex> lk_tab(mtx_table);
+            table[currentTime] = current;
+            ++currentTime;
+        }
 
-                // Calculate turnaround time: finish - arrival
-                currentProcess.turnaroundTime = currentProcess.finishTime - currentProcess.arrivalTime;
-                totalTurnaroundTime += currentProcess.turnaroundTime;
-
-                // Calculate waiting time: turnaround - burst
-                currentProcess.waitingTime = currentProcess.turnaroundTime - currentProcess.burstTime;
-                totalWaitingTime += currentProcess.waitingTime;
-
-                double avgT = double(totalTurnaroundTime) / processCounter;
-                double avgW = double(totalWaitingTime)    / processCounter;
-                if (SecondWindow::instance) {
-                    QMetaObject::invokeMethod(
-                        SecondWindow::instance,
-                        "onStatsUpdated",
-                        Qt::QueuedConnection,
-                        Q_ARG(double, avgT),
-                        Q_ARG(double, avgW)
-                        );
-                }
-            }
-
-            // Record the process running at this time
-            unique_lock<mutex> lock(mtx_table);
-            table[currentTime] = currentProcess;
+        // 7) re‑enqueue or finish
+        if (current.remainingTime > 0) {
+            arrivalQueue.push(current);
         }
         else {
+            // finished → compute stats
+            current.finishTime     = currentTime;
+            current.turnaroundTime = current.finishTime - current.arrivalTime;
+            current.waitingTime    = current.turnaroundTime - current.burstTime;
 
-            // If no process is ready, record an idle state
-            Process idleProcess;   // Uses default constructor, id = "idle"
-            table[currentTime] = idleProcess;
-        }
-        // Move time forward by one unit
-        {
-            lock_guard<mutex> lock2(mtx_currentTime);
-            currentTime++;
+            {
+                lock_guard<mutex> lk_cnt(mtx_processCounter);
+                ++processCounter;
+                totalTurnaroundTime += current.turnaroundTime;
+                totalWaitingTime    += current.waitingTime;
+            }
+
+            double avgW = double(totalWaitingTime)    / processCounter;
+            double avgT = double(totalTurnaroundTime) / processCounter;
+
+            if (SecondWindow::instance) {
+                // onStatsUpdated(double avgWaiting, double avgTurnaround)
+                QMetaObject::invokeMethod(
+                    SecondWindow::instance,
+                    "onStatsUpdated",
+                    Qt::QueuedConnection,
+                    Q_ARG(double, avgT),
+                    Q_ARG(double, avgW)
+                    );
+            }
         }
     }
 }
