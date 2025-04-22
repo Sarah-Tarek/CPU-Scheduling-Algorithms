@@ -18,8 +18,6 @@
 
 SecondWindow* SecondWindow::instance = nullptr;
 
-std::atomic<bool> paused = false;
-
 SecondWindow::SecondWindow(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::SecondWindow)
@@ -78,7 +76,7 @@ void SecondWindow::startSimulation(const QString &algorithm){
 
     //stopThreads = false;
 
-    /*readyQueueThread = std::thread([]() {
+    readyQueueThread = std::thread([]() {
         addToReadyQueue();
     });
 
@@ -86,32 +84,8 @@ void SecondWindow::startSimulation(const QString &algorithm){
 
     schedulerThread = std::thread([this, algorithm]() {
         runAlgorithm(algorithm);
-    });*/
-
-    readyQueueThread = std::thread([this]() {
-        while(1){
-            while (paused.load()) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(50));
-            }
-            // Perform the task (add to ready queue)
-            addToReadyQueue();
-            // Sleep between iterations
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-        }
     });
 
-    schedulerThread = std::thread([this, algorithm]() {
-        while(1){
-            while (paused.load()) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(50));
-            }
-            // Run the selected algorithm
-            runAlgorithm(algorithm);
-            // Sleep between iterations
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
-    });
 
     /*
     liveTableThread = std::thread([this]() {
@@ -133,9 +107,6 @@ void SecondWindow::startSimulation(const QString &algorithm){
 
 void SecondWindow::runAlgorithm(const QString &algorithmName)
 {
-    if (paused.load()) {
-        return; // Skip updating while paused
-    }
     if (algorithmName == "FCFS") {
         FCFS();
     }
@@ -220,15 +191,9 @@ void SecondWindow::onAddProcessClicked()
 
 void SecondWindow::setupLiveTable()
 {
-    if (paused.load()) {
-        return; // Skip updating while paused
-    }
     ui->liveTable->setColumnCount(3);
     ui->liveTable->setHorizontalHeaderLabels({"PID","Arrival Time", "Remaining Time"});
     ui->liveTable->horizontalHeader()->setStretchLastSection(true);
-
-
-
 
 }
 
@@ -247,9 +212,6 @@ void SecondWindow::fillTable()
 }
 
 void SecondWindow::liveTableChart() {
-    if (paused.load()) {
-        return; // Skip updating while paused
-    }
     while (true) {
         std::this_thread::sleep_for(std::chrono::seconds(1));  // Sleep before checking
 
@@ -319,9 +281,6 @@ void SecondWindow::liveTableChart() {
 
 void SecondWindow::updateGanttChart()
 {
-    if (paused.load()) {
-        return; // Skip updating while paused
-    }
 
     if(finishFlag && chartX >= currentTime ){
         timer->stop();
@@ -450,25 +409,4 @@ void SecondWindow::on_resetButton_clicked()
 
 
 }
-
-
-void SecondWindow::on_Pause_PushButton_clicked()
-{
-    paused = true;
-    if (timer && timer->isActive()) {
-        timer->stop(); // this pauses the Gantt chart updates
-    }
-    //cv_pause.notify_all();
-
-}
-
-void SecondWindow::on_Resume_PushButton_clicked()
-{
-    paused = false;
-    if (timer && !timer->isActive()) {
-        timer->start(1000); // resumes the updates every second
-    }
-    //cv_pause.notify_all();  // Resume any waiting threads
-}
-
 

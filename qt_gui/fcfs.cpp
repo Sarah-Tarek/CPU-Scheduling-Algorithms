@@ -79,6 +79,7 @@ void FCFS() { //max_time for test change for void in the main function//void FCF
 
                 double avgT = double(totalTurnaroundTime) / processCounter;
                 double avgW = double(totalWaitingTime)    / processCounter;
+
                 if (SecondWindow::instance) {
                     QMetaObject::invokeMethod(
                         SecondWindow::instance,
@@ -88,7 +89,6 @@ void FCFS() { //max_time for test change for void in the main function//void FCF
                         Q_ARG(double, avgW)
                         );
                 }
-            }
 
             // Record the process running at this time
             unique_lock<mutex> lock(mtx_table);

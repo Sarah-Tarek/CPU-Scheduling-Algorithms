@@ -7,7 +7,7 @@
 #include <QTimer>
 #include <QGraphicsScene>
 #include <thread>
-#include <atomic>
+
 
 
 namespace Ui {
@@ -42,8 +42,6 @@ private slots:
 
 
     void on_resetButton_clicked();
-    void on_Pause_PushButton_clicked();
-    void on_Resume_PushButton_clicked();
 
 private:
     Ui::SecondWindow *ui;
@@ -75,6 +73,5 @@ private:
     void updateGanttChart1();
 };
 
-extern std::atomic<bool> paused;
 
 #endif // SECONDWINDOW_H

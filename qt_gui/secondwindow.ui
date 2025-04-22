@@ -193,32 +193,6 @@
     <string>Reset</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="Pause_PushButton">
-   <property name="geometry">
-    <rect>
-     <x>500</x>
-     <y>440</y>
-     <width>93</width>
-     <height>29</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Pause</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="Resume_PushButton">
-   <property name="geometry">
-    <rect>
-     <x>620</x>
-     <y>440</y>
-     <width>93</width>
-     <height>29</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Resume</string>
-   </property>
-  </widget>
  </widget>
  <resources/>
  <connections/>
