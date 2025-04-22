@@ -101,6 +101,9 @@ void FCFS() { //max_time for test change for void in the main function//void FCF
             table[currentTime] = idleProcess;
         }
         // Move time forward by one unit
-        currentTime++;
+        {
+            lock_guard<mutex> lock2(mtx_currentTime);
+            currentTime++;
+        }
     }
 }
