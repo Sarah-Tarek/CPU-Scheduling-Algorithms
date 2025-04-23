@@ -15,7 +15,6 @@
  ***********************************************************************************************/
 #include "sjf_preemptive.h"
 #include"global_variables.h"
-#include<iostream>
 #include <climits>
 #include<algorithm>
 #include<thread>
